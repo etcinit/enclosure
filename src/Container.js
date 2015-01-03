@@ -6,19 +6,49 @@ var Container,
 
     ensure = require('ensure.js');
 
+/**
+ * Enclosure Container
+ *
+ * An IOC Container
+ *
+ * @constructor
+ */
 Container = function () {
-    this.resolved = [];
-
+    /**
+     * Container bindings
+     *
+     * @type {Array}
+     */
     this.bindings = [];
 
+    /**
+     * Singleton instances
+     *
+     * @type {Array}
+     */
     this.instances = [];
 
     this.aliases = [];
 
+    /**
+     * Factory functions
+     *
+     * @type {Array}
+     */
     this.factories = [];
 
     this.buildStack = [];
 
+    /**
+     * The max depth dependencies will be explored
+     *
+     * Circular dependencies or overly complex applications
+     * might cause the container to reach this limit and bail.
+     *
+     * If you are encountering this issue, you can increase the value below
+     *
+     * @type {number}
+     */
     this.maxDepth = 255;
 };
 
@@ -134,9 +164,19 @@ Container.prototype.build = function (concrete, parameters) {
     // If the concrete is a Wrap object, we can resolve its dependencies
     // and then construct an instance
     if (this.isWrapped(concrete)) {
-        // TODO: Resolve the wrapper using a queue
+        var wrap = this.bindings[concrete];
+
+        var dependencies = this.resolveDependencies(wrap);
+
+        // When calling the constructor in the Wrap object, we pass a reference
+        // to this container, and all the dependencies as arguments
+        var constructorArguments = [this].concat(dependencies);
+
+        var constructor =  wrap.getConstructor();
 
         this.buildStack.pop();
+
+        return constructor.apply(Object.create(constructor.prototype), constructorArguments);
     }
 
     throw new Error('Unable to resolve. The concrete type is not instantiable');
@@ -148,7 +188,7 @@ Container.prototype.build = function (concrete, parameters) {
  * @param wrap
  * @returns {Array}
  */
-Container.prototype.getDependencies = function (wrap) {
+Container.prototype.resolveDependencies = function (wrap) {
     var dependenciesNames = wrap.getDependencies(),
         dependencies = [];
 
@@ -170,23 +210,42 @@ Container.prototype.isWrapped = function (concrete) {
         this.bindings[concrete] instanceof Wrap);
 };
 
+/**
+ * Check if an abstract is resolvable by this container
+ *
+ * @param abstract
+ * @returns {boolean}
+ */
 Container.prototype.isResolvable = function (abstract) {
     if (this.instances[abstract]) {
         return true;
     }
 
-    // TODO: Bindings
-    // TODO: Wraps
+    try {
+        var concrete = this.getConcrete(abstract);
 
-    return false;
+        return true;
+    } catch (err) {
+        return false;
+    }
 };
 
-Container.prototype.isResolved = function (abstract) {
-    return (abstract in this.resolved);
-};
-
+/**
+ * Get whether a concrete type can be built by this container
+ *
+ * @param concrete
+ * @returns {boolean}
+ */
 Container.prototype.isBuildable = function (concrete) {
-    // TODO: Wraps
+    // If we have a factory function, we can build the type
+    if (concrete in this.factories) {
+        return true;
+    }
+
+    // If we have a wrap, we can also build it
+    if (concrete in this.bindings && this.bindings[concrete] instanceof Wrap) {
+        return true;
+    }
 
     return false;
 };
