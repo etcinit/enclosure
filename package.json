@@ -1,0 +1,15 @@
+{
+  "name": "enclosure",
+  "version": "0.0.0",
+  "description": "IOC Container",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eduard44/enclosure.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eduardo Trujillo <ed@chromabits.com> (http://chromabits.com/)",
+  "license": "ISC"
+}
