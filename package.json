@@ -11,5 +11,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eduardo Trujillo <ed@chromabits.com> (http://chromabits.com/)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "ensure.js": "^0.5.3"
+  }
 }
