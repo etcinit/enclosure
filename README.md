@@ -9,14 +9,14 @@ A Javascript IOC container and module loading system
 This library is still a work in progress. The main goal is to build some basic tools which should allow building complex service-based/class-based applications in JavaScript easy. Many of these concepts are borrowed from PHP/Laravel/Symfony development. Some of the planned features are:
 
 - A complete service/IOC container
-	- Singleton services
-	- Shared services (cached services)
-	- Factory functions
-	- Service providers, which could be defined inside `package.json` or a `providers.json` and be automatically loaded by the container
+	- [X] Singleton services
+	- [ ] Shared services (cached services)
+	- [X] Factory functions
+	- [ ] Service providers, which could be defined inside `package.json` or a `providers.json` and be automatically loaded by the container
 - An alternative to Node's `require` function
-	- Abstract the process of requiring modules from the filesystem
-	- Introduce something losely similar to namespaces from other languages. Namespaces would be defined based on the filepath in the project: `src/Chromabits/Mailer/MandrillMailer.js` should be accessible by doing something like `var MandrilMailer = use('Chromabits/Mailer/MandrillMailer')`.
-	- Introduce a new `namespace` key to `package.json` which would be parsed by the Enclosure loader in order to figure out namespace to filesystem mappings.
+	- [ ] Abstract the process of requiring modules from the filesystem
+	- [ ] Introduce something losely similar to namespaces from other languages. Namespaces would be defined based on the filepath in the project: `src/Chromabits/Mailer/MandrillMailer.js` should be accessible by doing something like `var MandrilMailer = use('Chromabits/Mailer/MandrillMailer')`.
+	- [ ] Introduce a new `namespace` key to `package.json` which would be parsed by the Enclosure loader in order to figure out namespace to filesystem mappings.
 
 ## Current status
 
@@ -73,6 +73,8 @@ var ServiceTwo = function (ServiceOne) {
 };
 
 app.bind('ServiceTwo', ServiceTwo);
+
+var instanceTwo = app.make('ServiceTwo');
 ```
 
 If you would like to access the container directly within a service declare `EnclosureContainer` as a dependency:
@@ -92,13 +94,23 @@ app.bind('ServiceThree', ServiceThree);
 
 Factory functions allow you to tell the container how to build a service for you. They are executed every time the container needs that service.
 
-// TODO
+```js
+app.factory('ServiceFour', function (container) {
+	var instanceOne = container.make('ServiceOne');
+	
+	// In this example ServiceFour requires a configuration object
+	// as the first parameter of the constructor, so constructor DI does
+	// not work. The factory function allows us to tell the container
+	// how to build this service
+	return new ServiceFour({ sayHello: true }, instanceOne);
+});
+```
 
 ## Wraps
 
 Wraps are delicious. They are a simple construct for coupling dependency definitions and a factory function for building a service instance.
 
-Wraps are useful when constructor dependency injection is not applicable, which can happen when your class requires parameters in the constructor which are not services, or whenyour code is minified (parameters names are lost).
+Wraps are useful when constructor dependency injection is not applicable, which can happen when your class requires parameters in the constructor which are not services, or when your code is minified (parameters names are lost).
 
 Defining a "wrapped service":
 
