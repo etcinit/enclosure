@@ -29,8 +29,6 @@ Container = function () {
      */
     this.instances = [];
 
-    this.aliases = [];
-
     /**
      * Factory functions
      *

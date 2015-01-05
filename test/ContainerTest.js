@@ -322,4 +322,167 @@ describe('Container', function () {
             }).should.throw();
         });
     });
+
+    describe('#make', function () {
+        it('should give priority to singleton instances', function () {
+            var container = new Container();
+
+            var instanceOne = new ServiceOne();
+
+            container.instance('ServiceOne', instanceOne);
+            container.bind('ServiceOne', ServiceOne);
+
+            container.make('ServiceOne').should.be.equal(instanceOne);
+        });
+    });
+
+    describe('#resolveDependencies', function () {
+        it('should resolve wrap dependencies', function () {
+            var container = new Container();
+
+            var oneWrap = new Wrap(['ServiceTwo', 'ServiceOneClone'], function (app) {
+                app.should.be.instanceOf(Container);
+
+                return new ServiceOne();
+            });
+
+            container.bind('ServiceTwo', ServiceTwo);
+            container.bind('ServiceOneClone', ServiceOne);
+
+            var dependencies = container.resolveDependencies(oneWrap);
+
+            dependencies[0].should.be.instanceOf(ServiceTwo);
+            dependencies[1].should.be.instanceOf(ServiceOne);
+        });
+
+        it('should resolve constructor dependencies', function () {
+            var container = new Container();
+
+            container.bind('ServiceOne', ServiceOne);
+            container.bind('ServiceTwo', ServiceTwo);
+
+            var dependencies = container.resolveDependencies(ServiceThree);
+
+            dependencies[0].should.be.instanceOf(ServiceOne);
+            dependencies[1].should.be.instanceOf(ServiceTwo);
+        });
+    });
+
+    describe('#getConcrete', function () {
+        it('should get the concrete bound to an abstract', function () {
+            var container = new Container();
+
+            container.bind('ServiceOne', ServiceOne);
+            container.bind('HelloService', 'ServiceOne');
+
+            container.getConcrete('HelloService').should.be.equal('ServiceOne');
+        });
+
+        it('should fail is there is no concrete bound to an abstract', function () {
+            var container = new Container();
+
+            container.bind('HelloService', 'ServiceOne');
+
+            (function () {
+                container.getConcrete('HelloService');
+            }).should.throw();
+        });
+
+        it('should resolve concrete types over abstract chains', function () {
+            var container = new Container();
+
+            container.bind('ServiceOne', ServiceOne);
+            container.bind('HelloWorldService', 'ServiceOne');
+            container.bind('HelloService', 'HelloWorldService');
+
+            container.getConcrete('HelloService').should.be.equal('ServiceOne');
+        });
+    });
+
+    describe('#isWrapped', function () {
+        it('should return true for Wrap concretes', function () {
+            var oneWrap = new Wrap([], function () {
+                return new ServiceOne();
+            });
+
+            var container = new Container();
+
+            container.bind('ServiceOne', oneWrap);
+
+            container.isWrapped('ServiceOne').should.be.true;
+        });
+
+        it('should return false for any other kind of concrete', function () {
+            var container = new Container();
+
+            container.instance('ServiceOne', new ServiceOne());
+            container.factory('ServiceTwo', function () {
+                return new ServiceTwo();
+            });
+            container.bind('ServiceThree', ServiceThree);
+
+            container.isWrapped('ServiceOne').should.be.false;
+            container.isWrapped('ServiceTwo').should.be.false;
+            container.isWrapped('ServiceThree').should.be.false;
+        });
+    });
+
+    describe('isResolvable', function () {
+        it('should return true if the type is resolvable', function () {
+            var container = new Container();
+
+            container.instance('ServiceOne', new ServiceOne());
+            container.factory('ServiceTwo', function () {
+                return new ServiceTwo();
+            });
+            container.bind('ServiceThree', ServiceThree);
+            container.bind('ServiceOneClone', new Wrap([], function () {
+                return new ServiceOne();
+            }));
+
+            container.isResolvable('ServiceOne').should.be.true;
+            container.isResolvable('ServiceTwo').should.be.true;
+            container.isResolvable('ServiceThree').should.be.true;
+            container.isResolvable('ServiceOneClone').should.be.true;
+        });
+
+        it('should return false if the type is only abstract or does not exist', function () {
+            var container = new Container();
+
+            container.bind('ServiceFour', 'ServiceFake');
+
+            container.isResolvable('ServiceFour').should.be.false;
+            container.isResolvable('ServiceFive').should.be.false;
+        });
+    });
+
+    describe('isBuildable', function () {
+        it('should return true if there is a factory, Wrap, or constructor binding', function () {
+            var container = new Container();
+
+            container.instance('ServiceOne', new ServiceOne());
+            container.factory('ServiceTwo', function () {
+                return new ServiceTwo();
+            });
+            container.bind('ServiceThree', ServiceThree);
+            container.bind('ServiceOneClone', new Wrap([], function () {
+                return new ServiceOne();
+            }));
+
+            container.isBuildable('ServiceTwo').should.be.true;
+            container.isBuildable('ServiceThree').should.be.true;
+            container.isBuildable('ServiceOneClone').should.be.true;
+        });
+
+        it('should return false otherwise', function () {
+            var container = new Container();
+
+            container.instance('ServiceOne', new ServiceOne());
+            container.bind('ServiceFour', 'ServiceFake');
+
+            container.isBuildable('ServiceOne').should.be.false;
+            container.isBuildable('ServiceFour').should.be.false;
+            container.isBuildable('ServiceFive').should.be.false;
+        });
+    });
 });
