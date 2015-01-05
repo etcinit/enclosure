@@ -1,4 +1,4 @@
-# Enclosure
+# Enclosure [![Build Status](https://travis-ci.org/eduard44/enclosure.svg?branch=master)](https://travis-ci.org/eduard44/enclosure)
 
 A Javascript IOC container and module loading system
 
