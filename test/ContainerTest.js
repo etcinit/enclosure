@@ -1,8 +1,8 @@
 "use strict";
 
-var Container = require('../src/Container'),
+var Container = require('../src/Chromabits/Container/Container'),
 
-    Wrap = require('../src/Wrap');
+    Wrap = require('../src/Chromabits/Container/Wrap');
 
 /**
  * Simple hello world service

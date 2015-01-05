@@ -1,7 +1,7 @@
 "use strict";
 
-var Container = require('./src/Container'),
-    Wrap = require('./src/Wrap');
+var Container = require('./src/Chromabits/Container/Container'),
+    Wrap = require('./src/Chromabits/Container/Wrap');
 
 module.exports = {
     Container: Container,
