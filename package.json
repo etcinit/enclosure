@@ -13,7 +13,9 @@
   "author": "Eduardo Trujillo <ed@chromabits.com> (http://chromabits.com/)",
   "license": "ISC",
   "dependencies": {
-    "ensure.js": "^0.5.3"
+    "ensure.js": "^0.5.3",
+    "introspect": "0.0.3",
+    "retrieve-arguments": "^1.0.1"
   },
   "devDependencies": {
     "istanbul": "^0.3.5",

@@ -30,6 +30,21 @@ ServiceTwo.prototype.getName = function () {
     return 'Hello World from ServiceTwo';
 };
 
+/**
+ * Simple hello world service
+ *
+ * @constructor
+ */
+var ServiceThree = function (ServiceOne, ServiceTwo) {
+    this.one = ServiceOne;
+
+    this.two = ServiceTwo;
+};
+
+ServiceThree.prototype.gotDependencies = function () {
+    return this.one instanceof ServiceOne && this.two instanceof ServiceTwo;
+};
+
 describe('Container', function () {
     it('should be a constructor', function() {
         var instance = new Container();
@@ -71,14 +86,10 @@ describe('Container', function () {
             instanceOne.should.not.be.equal(ServiceTwo);
         });
 
-        it('should allow defining a concrete using a factory function', function () {
+        it('should allow defining a concrete using a constructor', function () {
             var container = new Container();
 
-            container.bind('ServiceOne', function (app) {
-                app.should.be.instanceOf(Container);
-
-                return new ServiceOne();
-            });
+            container.bind('ServiceOne', ServiceOne);
 
             var instanceOne = container.make('ServiceOne');
             var instanceTwo = container.make('ServiceOne');
@@ -131,6 +142,26 @@ describe('Container', function () {
         });
     });
 
+    describe('factory', function () {
+        it('should allow defining a concrete using a factory function', function () {
+            var container = new Container();
+
+            container.factory('ServiceOne', function (app) {
+                app.should.be.instanceOf(Container);
+
+                return new ServiceOne();
+            });
+
+            var instanceOne = container.make('ServiceOne');
+            var instanceTwo = container.make('ServiceOne');
+
+            instanceOne.should.be.instanceOf(ServiceOne);
+            instanceTwo.should.be.instanceOf(ServiceOne);
+
+            instanceOne.should.not.be.equal(ServiceTwo);
+        });
+    });
+
     describe('build', function () {
         it('should create new instances of concretes from Wraps', function () {
             var oneWrap = new Wrap([], function (app) {
@@ -168,7 +199,7 @@ describe('Container', function () {
         it('should create new instances of concretes from factory functions', function () {
             var container = new Container();
 
-            container.bind('ServiceOne', function (app) {
+            container.factory('ServiceOne', function (app) {
                 app.should.be.instanceOf(Container);
 
                 return new ServiceOne();
@@ -182,7 +213,7 @@ describe('Container', function () {
         it('should pass parameters to factory functions', function () {
             var container = new Container();
 
-            container.bind('ServiceOne', function (app, text) {
+            container.factory('ServiceOne', function (app, text) {
                 app.should.be.instanceOf(Container);
                 text.should.be.equal('Hello');
 
@@ -194,10 +225,20 @@ describe('Container', function () {
             instanceOne.should.be.instanceOf(ServiceOne);
         });
 
+        it('should create new instances of concretes from constructors', function () {
+            var container = new Container();
+
+            container.bind('ServiceOne', ServiceOne);
+
+            var instanceOne = container.build('ServiceOne');
+
+            instanceOne.should.be.instanceOf(ServiceOne);
+        });
+
         it('should not create instances of abstracts', function () {
             var container = new Container();
 
-            container.bind('ServiceOne', function (app) {
+            container.factory('ServiceOne', function (app) {
                 app.should.be.instanceOf(Container);
 
                 return new ServiceOne();
@@ -210,7 +251,7 @@ describe('Container', function () {
             }).should.throw();
         });
 
-        it('should resolved nested dependencies', function () {
+        it('should resolve nested dependencies', function () {
             var oneWrap = new Wrap([], function (app) {
                 app.should.be.instanceOf(Container);
 
@@ -232,6 +273,21 @@ describe('Container', function () {
             var instanceTwo = container.build('ServiceTwo');
 
             instanceTwo.should.be.instanceOf(ServiceTwo);
+        });
+
+        it('should resolve dependencies for constructors', function () {
+            it('should create new instances of concretes from constructors', function () {
+                var container = new Container();
+
+                container.bind('ServiceOne', ServiceOne);
+                container.bind('ServiceTwo', ServiceTwo);
+                container.bind('ServiceThree', ServiceThree);
+
+                var instanceOne = container.build('ServiceThree');
+
+                instanceOne.should.be.instanceOf(ServiceThree);
+                instanceOne.gotDependencies().should.be.true;
+            });
         });
 
         it('should detect circular dependencies', function () {
