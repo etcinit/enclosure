@@ -162,7 +162,11 @@ Container.prototype.build = function (concrete, parameters) {
     // If there is one, we will use it to build the instance. This
     // allows functions to be defined as more refined resolvers
     if (concrete in this.factories) {
-        return this.factories[concrete](this, parameters);
+        var factoryArguments = [this].concat(parameters);
+
+        var factoryFunction = this.factories[concrete];
+
+        return factoryFunction.apply(Object.create(factoryFunction.prototype), factoryArguments);
     }
 
     this.buildStack.push(concrete);
@@ -183,7 +187,7 @@ Container.prototype.build = function (concrete, parameters) {
 
         // When calling the constructor in the Wrap object, we pass a reference
         // to this container, and all the dependencies as arguments
-        var constructorArguments = [this].concat(dependencies);
+        var constructorArguments = [this].concat(dependencies, parameters);
 
         var constructor =  wrap.getConstructor();
 

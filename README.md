@@ -20,7 +20,9 @@ This library is still a work in progress. The main goal is to build some basic t
 
 ## Current status
 
-There is a basic implementation of the Container and Wrap classes (Wraps are explained below). The container should allow defining singletons, services built by factory functions, and "Wrapped" services.
+There is a basic implementation of the Container and Wrap classes (Wraps are explained below). 
+The container should allow defining singletons, services built by factory functions, and "Wrapped" services.
+It will also detect circular dependencies. 
 
 TODO: The Loader system, advanced container features (Shared services, Service providers)
 
@@ -72,7 +74,7 @@ var myService = app.make('ServiceOne');
 
 ## Wraps
 
-Wraps are delicious. They are a simple construct for coupling dependency definitions and a function for building that service.
+Wraps are delicious. They are a simple construct for coupling dependency definitions and a function for building a service instance.
 
 // TODO
 

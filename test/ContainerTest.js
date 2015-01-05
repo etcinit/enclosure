@@ -130,4 +130,132 @@ describe('Container', function () {
             instanceOne.should.not.be.equal(ServiceTwo);
         });
     });
+
+    describe('build', function () {
+        it('should create new instances of concretes from Wraps', function () {
+            var oneWrap = new Wrap([], function (app) {
+                app.should.be.instanceOf(Container);
+
+                return new ServiceOne();
+            });
+
+            var container = new Container();
+
+            container.bind('ServiceOne', oneWrap);
+
+            var instanceOne = container.build('ServiceOne');
+
+            instanceOne.should.be.instanceOf(ServiceOne);
+        });
+
+        it('should pass parameters to the Wrap inner constructor', function () {
+            var oneWrap = new Wrap([], function (app, text) {
+                app.should.be.instanceOf(Container);
+                text.should.be.equal('Hello');
+
+                return new ServiceOne();
+            });
+
+            var container = new Container();
+
+            container.bind('ServiceOne', oneWrap);
+
+            var instanceOne = container.build('ServiceOne', ['Hello']);
+
+            instanceOne.should.be.instanceOf(ServiceOne);
+        });
+
+        it('should create new instances of concretes from factory functions', function () {
+            var container = new Container();
+
+            container.bind('ServiceOne', function (app) {
+                app.should.be.instanceOf(Container);
+
+                return new ServiceOne();
+            });
+
+            var instanceOne = container.build('ServiceOne');
+
+            instanceOne.should.be.instanceOf(ServiceOne);
+        });
+
+        it('should pass parameters to factory functions', function () {
+            var container = new Container();
+
+            container.bind('ServiceOne', function (app, text) {
+                app.should.be.instanceOf(Container);
+                text.should.be.equal('Hello');
+
+                return new ServiceOne();
+            });
+
+            var instanceOne = container.build('ServiceOne', ['Hello']);
+
+            instanceOne.should.be.instanceOf(ServiceOne);
+        });
+
+        it('should not create instances of abstracts', function () {
+            var container = new Container();
+
+            container.bind('ServiceOne', function (app) {
+                app.should.be.instanceOf(Container);
+
+                return new ServiceOne();
+            });
+
+            container.bind('HelloService', 'ServiceOne');
+
+            (function () {
+                container.build('HelloService');
+            }).should.throw();
+        });
+
+        it('should resolved nested dependencies', function () {
+            var oneWrap = new Wrap([], function (app) {
+                app.should.be.instanceOf(Container);
+
+                return new ServiceOne();
+            });
+
+            var twoWrap = new Wrap(['ServiceOne'], function (app, serviceOne) {
+                app.should.be.instanceOf(Container);
+                serviceOne.should.be.instanceOf(ServiceOne);
+
+                return new ServiceTwo();
+            });
+
+            var container = new Container();
+
+            container.bind('ServiceOne', oneWrap);
+            container.bind('ServiceTwo', twoWrap);
+
+            var instanceTwo = container.build('ServiceTwo');
+
+            instanceTwo.should.be.instanceOf(ServiceTwo);
+        });
+
+        it('should detect circular dependencies', function () {
+            var oneWrap = new Wrap(['ServiceTwo'], function (app) {
+                app.should.be.instanceOf(Container);
+
+                return new ServiceOne();
+            });
+
+            var twoWrap = new Wrap(['ServiceOne'], function (app, serviceOne) {
+                app.should.be.instanceOf(Container);
+                serviceOne.should.be.instanceOf(ServiceOne);
+
+                return new ServiceTwo();
+            });
+
+            var container = new Container();
+
+            container.bind('ServiceOne', oneWrap);
+            container.bind('ServiceTwo', twoWrap);
+
+            (function () {
+                container.build('ServiceTwo');
+            }).should.throw();
+        });
+    });
 });
