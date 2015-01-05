@@ -1,6 +1,8 @@
 "use strict";
 
-var Wrap;
+var Wrap,
+
+    ensure = require('ensure.js');
 
 /**
  * Dependency wrapper for the Enclosure container
@@ -11,26 +13,16 @@ var Wrap;
  * followed by instances of every dependency in the order
  * they are specified in the dependencies array
  *
- * @param name
  * @param dependencies
  * @param constructor
  * @constructor
  */
-Wrap = function (name, dependencies, constructor) {
-    this.name = name;
-
+Wrap = function (dependencies, constructor) {
     this.dependencies = dependencies || [];
 
-    this.constructor = constructor;
-};
+    ensure(constructor, Function);
 
-/**
- * Get the name of the class/module
- *
- * @returns {*}
- */
-Wrap.prototype.getName = function () {
-    return this.name;
+    this.constructor = constructor;
 };
 
 /**

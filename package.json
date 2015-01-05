@@ -8,11 +8,16 @@
     "url": "https://github.com/eduard44/enclosure.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/ test/**/*.js"
   },
   "author": "Eduardo Trujillo <ed@chromabits.com> (http://chromabits.com/)",
   "license": "ISC",
   "dependencies": {
     "ensure.js": "^0.5.3"
+  },
+  "devDependencies": {
+    "istanbul": "^0.3.5",
+    "mocha": "^2.1.0",
+    "should": "^4.4.2"
   }
 }
