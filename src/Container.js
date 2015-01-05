@@ -73,16 +73,23 @@ Container.prototype.instance = function (abstract, instance) {
  * @param concrete
  */
 Container.prototype.bind = function (abstract, concrete) {
+    ensure(abstract, String);
+    // TODO: Type-check concrete param once ensure.js supports Maybe
+
     // If the concrete implementation is either a string or a Wrap,
     // we just create a binding
     if (concrete instanceof Wrap || ensure.isString(concrete)) {
         this.bindings[abstract] = concrete;
+
+        return;
     }
 
     // If the concrete implementation is a function, then
     // we assume it is a factory function
     if (concrete instanceof Function) {
         this.factories[abstract] = concrete;
+
+        return;
     }
 
     throw new Error('Unsupported binding type');
@@ -98,21 +105,27 @@ Container.prototype.bind = function (abstract, concrete) {
 Container.prototype.getConcrete = function (abstract) {
     // If the abstract is not defined in the bindings array
     // then we can't find a concrete, so we have to bail
-    if (!(abstract in this.bindings)) {
+    if (!(abstract in this.bindings) && !(abstract in this.factories)) {
         throw new Error('Unable to resolve concrete type');
     }
 
-    var concrete = this.bindings[abstract];
+    if (abstract in this.bindings) {
+        var concrete = this.bindings[abstract];
 
-    // If the concrete is a string, then it still is abstract
-    // so we need to recurse and try to find it's concrete
-    if (ensure.isString(concrete)) {
-        return this.getConcrete(concrete);
-    }
+        // If the concrete is a string, then it still is abstract
+        // so we need to recurse and try to find it's concrete
+        if (ensure.isString(concrete)) {
+            return this.getConcrete(concrete);
+        }
 
-    // If there is a Wrap bound to the abstract, then we know
-    // it is actually already concrete
-    if (concrete instanceof Wrap) {
+        // If there is a Wrap bound to the abstract, then we know
+        // it is actually already concrete already
+        if (concrete instanceof Wrap) {
+            return abstract;
+        }
+    } else if (abstract in this.factories) {
+        // If there is a factory function for the abstract, then we know
+        // it is actually a concrete already
         return abstract;
     }
 

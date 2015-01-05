@@ -2,7 +2,8 @@
 
 var Wrap,
 
-    ensure = require('ensure.js');
+    ensure = require('ensure.js'),
+    Nullable = ensure.Nullable;
 
 /**
  * Dependency wrapper for the Enclosure container
@@ -18,9 +19,10 @@ var Wrap,
  * @constructor
  */
 Wrap = function (dependencies, constructor) {
-    this.dependencies = dependencies || [];
-
+    ensure(dependencies, Nullable(Array));
     ensure(constructor, Function);
+
+    this.dependencies = dependencies || [];
 
     this.constructor = constructor;
 };
