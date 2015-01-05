@@ -52,6 +52,14 @@ describe('Container', function () {
         instance.should.be.instanceOf(Container);
     });
 
+    it('should register a single instance of itself', function () {
+        var instance = new Container();
+
+        var container = instance.make('EnclosureContainer');
+
+        container.should.be.instanceOf(Container);
+    });
+
     describe('#instance', function () {
         it('should register singleton instances', function() {
             var oneInstance = new ServiceOne();

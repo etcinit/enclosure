@@ -53,33 +53,62 @@ var myServiceInstance = new ServiceOne();
 app.instance('ServiceOne', myServiceInstance);
 ```
 
-Defining a "wrapped service":
-
-```js
-var myServiceWrap = new Wrap(['DependencyOne', 'DependencyTwo'], function (DependencyOne, DependencyTwo) {
-	// When this function is called, dependencies will be passed
-	// as arguments. In this case, we just pass them along to the
-	// constructor of our service so that we can use them inside it
-	return new ServiceOne(DependencyOne, DependencyTwo);
-});
-
-app.bind('ServiceOne', myServiceWrap);
-```
-
 Using a service:
 
 ```js
 var myService = app.make('ServiceOne');
 ```
 
-## Wraps
+## Constructor dependency injection
 
-Wraps are delicious. They are a simple construct for coupling dependency definitions and a function for building a service instance.
+Defining a service using constructor dependency injection:
 
-// TODO
+```js
+// Enclosure's Container will use instrospection to look
+// at the constructor's parameters and try to resolve
+// services with matching names
+var ServiceTwo = function (ServiceOne) {
+	// Keep references to service instances
+	this.one = ServiceOne;
+};
+
+app.bind('ServiceTwo', ServiceTwo);
+```
+
+If you would like to access the container directly within a service declare `EnclosureContainer` as a dependency:
+
+```js
+var ServiceThree = function (EnclosureContainer) {
+	this.app = EnclosureContainer;
+	
+	// Then you can call the container from within your class
+	// ex: var someService = this.app.make('SomeService');
+};
+
+app.bind('ServiceThree', ServiceThree);
+```
 
 ## Factories
 
 Factory functions allow you to tell the container how to build a service for you. They are executed every time the container needs that service.
 
 // TODO
+
+## Wraps
+
+Wraps are delicious. They are a simple construct for coupling dependency definitions and a factory function for building a service instance.
+
+Wraps are useful when constructor dependency injection is not applicable, which can happen when your class requires parameters in the constructor which are not services, or whenyour code is minified (parameters names are lost).
+
+Defining a "wrapped service":
+
+```js
+var myServiceWrap = new Wrap(['DependencyOne', 'DependencyTwo'], function (container, DependencyOne, DependencyTwo) {
+	// When this function is called, dependencies will be passed
+	// as arguments. In this case, we just pass them along to the
+	// constructor of our service so that we can use them inside it
+	return new ServiceOne(DependencyOne, DependencyTwo, 'some config string');
+});
+
+app.bind('ServiceOne', myServiceWrap);
+```

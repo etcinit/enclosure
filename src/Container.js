@@ -51,6 +51,11 @@ Container = function () {
      * @type {number}
      */
     this.maxDepth = 255;
+
+    /**
+     * Make the container available as a service
+     */
+    this.instance('EnclosureContainer', this);
 };
 
 /**
