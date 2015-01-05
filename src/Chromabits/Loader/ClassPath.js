@@ -21,6 +21,8 @@ ClassPath = function (path) {
      * @type {RegExp}
      */
     this.fullyQualifiedNamespaceRegex = /^([/]?)([A-Za-z]+[/])*([A-Za-z]+)$/;
+
+    this.parse();
 };
 
 ClassPath.prototype.isValid = function () {
@@ -29,6 +31,11 @@ ClassPath.prototype.isValid = function () {
 
 ClassPath.prototype.parse = function () {
     var original = this.original;
+
+    // Check if the classpath string is valid
+    if (!this.isValid()) {
+        throw new Error('ClassPath is not valid');
+    }
 
     this.relative = true;
 
@@ -52,19 +59,37 @@ ClassPath.prototype.toString = function () {
 };
 
 ClassPath.prototype.getClassName = function () {
-
+    return this.path[this.path.length - 1];
 };
 
 ClassPath.prototype.getNamespace = function () {
+    if (this.path.length > 1) {
+        var namespace = this.path.slice(0, this.path.length - 1);
 
+        if (this.isAbsolute()) {
+            return '/' + namespace.join('/');
+        }
+
+        return namespace.join('/');
+    }
+
+    return '/';
+};
+
+ClassPath.prototype.getNamespaceAsArray = function () {
+    if (this.path.length > 1) {
+        return this.path.slice(0, this.path.length - 1);
+    }
+
+    return [];
 };
 
 ClassPath.prototype.isRelative = function () {
-
+    return this.relative;
 };
 
 ClassPath.prototype.isAbsolute = function () {
-
+    return !this.relative;
 };
 
-module.export = ClassPath;
+module.exports = ClassPath;

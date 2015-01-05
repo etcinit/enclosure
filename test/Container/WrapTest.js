@@ -1,6 +1,6 @@
 "use strict";
 
-var Wrap = require('../src/Chromabits/Container/Wrap');
+var Wrap = require('../../src/Chromabits/Container/Wrap');
 
 describe('Wrap', function () {
     it('should be a constructor', function () {
