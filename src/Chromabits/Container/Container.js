@@ -4,7 +4,8 @@ var Container,
 
     Wrap = require('./Wrap'),
 
-    ensure = require('ensure.js');
+    ensure = require('ensure.js'),
+    introspect = require('retrieve-arguments');
 
 /**
  * Enclosure Container
@@ -28,8 +29,6 @@ Container = function () {
      */
     this.instances = [];
 
-    this.aliases = [];
-
     /**
      * Factory functions
      *
@@ -50,6 +49,11 @@ Container = function () {
      * @type {number}
      */
     this.maxDepth = 255;
+
+    /**
+     * Make the container available as a service
+     */
+    this.instance('EnclosureContainer', this);
 };
 
 /**
@@ -78,21 +82,26 @@ Container.prototype.bind = function (abstract, concrete) {
 
     // If the concrete implementation is either a string or a Wrap,
     // we just create a binding
-    if (concrete instanceof Wrap || ensure.isString(concrete)) {
+    if (concrete instanceof Wrap || concrete instanceof Function || ensure.isString(concrete)) {
         this.bindings[abstract] = concrete;
 
         return;
     }
 
-    // If the concrete implementation is a function, then
-    // we assume it is a factory function
-    if (concrete instanceof Function) {
-        this.factories[abstract] = concrete;
-
-        return;
-    }
-
     throw new Error('Unsupported binding type');
+};
+
+/**
+ * Bind a factory function to an abstract
+ *
+ * @param abstract
+ * @param concrete
+ */
+Container.prototype.factory = function (abstract, concrete) {
+    ensure(abstract, String);
+    ensure(concrete, Function);
+
+    this.factories[abstract] = concrete;
 };
 
 /**
@@ -118,9 +127,9 @@ Container.prototype.getConcrete = function (abstract) {
             return this.getConcrete(concrete);
         }
 
-        // If there is a Wrap bound to the abstract, then we know
+        // If there is a Wrap or constructor bound to the abstract, then we know
         // it is actually already concrete already
-        if (concrete instanceof Wrap) {
+        if (concrete instanceof Wrap || concrete instanceof Function) {
             return abstract;
         }
     } else if (abstract in this.factories) {
@@ -162,7 +171,11 @@ Container.prototype.build = function (concrete, parameters) {
     // If there is one, we will use it to build the instance. This
     // allows functions to be defined as more refined resolvers
     if (concrete in this.factories) {
-        return this.factories[concrete](this, parameters);
+        var factoryArguments = [this].concat(parameters);
+
+        var factoryFunction = this.factories[concrete];
+
+        return factoryFunction.apply(Object.create(factoryFunction.prototype), factoryArguments);
     }
 
     this.buildStack.push(concrete);
@@ -183,7 +196,7 @@ Container.prototype.build = function (concrete, parameters) {
 
         // When calling the constructor in the Wrap object, we pass a reference
         // to this container, and all the dependencies as arguments
-        var constructorArguments = [this].concat(dependencies);
+        var constructorArguments = [this].concat(dependencies, parameters);
 
         var constructor =  wrap.getConstructor();
 
@@ -192,18 +205,40 @@ Container.prototype.build = function (concrete, parameters) {
         return constructor.apply(Object.create(constructor.prototype), constructorArguments);
     }
 
+    // If the concrete is just a function, then we will assume it is a service constructor
+    // We will use introspection to find out which are its dependencies
+    if (concrete in this.bindings && this.bindings[concrete] instanceof Function) {
+        var constructor = this.bindings[concrete];
+
+        var dependencies = this.resolveDependencies(constructor);
+
+        this.buildStack.pop();
+
+        // Do some magic to call new with a variable number of arguments
+        // See http://stackoverflow.com/questions/1606797/use-of-apply-with-new-operator-is-this-possible
+        return new (Function.prototype.bind.apply(constructor, dependencies));
+    }
+
     throw new Error('Unable to resolve. The concrete type is not instantiable');
 };
 
 /**
- * Use the container to get the dependencies of a Wrap
+ * Use the container to get the dependencies of a Wrap or a constructor function
  *
- * @param wrap
+ * @param construct
  * @returns {Array}
  */
-Container.prototype.resolveDependencies = function (wrap) {
-    var dependenciesNames = wrap.getDependencies(),
+Container.prototype.resolveDependencies = function (construct) {
+    var dependenciesNames = [],
         dependencies = [];
+
+    if (construct instanceof Wrap) {
+        dependenciesNames = construct.getDependencies();
+    } else if (construct instanceof Function) {
+        dependenciesNames = introspect(construct);
+    } else {
+        throw new Error('Expected either a Wrap or function');
+    }
 
     dependenciesNames.forEach(function (dependencyName) {
         dependencies.push(this.make(dependencyName))
@@ -255,8 +290,9 @@ Container.prototype.isBuildable = function (concrete) {
         return true;
     }
 
-    // If we have a wrap, we can also build it
-    if (concrete in this.bindings && this.bindings[concrete] instanceof Wrap) {
+    // If we have a wrap or constructor, we can also build it
+    if (concrete in this.bindings &&
+        (this.bindings[concrete] instanceof Wrap) || (this.bindings[concrete] instanceof Function)) {
         return true;
     }
 
