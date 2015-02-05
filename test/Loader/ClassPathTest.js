@@ -72,6 +72,61 @@ describe('ClassPath', function () {
 
             new ClassPath('/Chromabits/Testing/MyClass')
                 .getClassName().should.be.equal('MyClass');
+
+            new ClassPath('MyClass')
+                .getClassName().should.be.equal('MyClass');
+
+            new ClassPath('/MyClass')
+                .getClassName().should.be.equal('MyClass');
+        });
+    });
+
+    describe('#getNamespace', function () {
+        it('should return the namespace as a string', function () {
+            new ClassPath('Chromabits/Testing/MyClass')
+                .getNamespace().should.be.equal('Chromabits/Testing/');
+
+            new ClassPath('/Chromabits/Testing/MyClass')
+                .getNamespace().should.be.equal('/Chromabits/Testing/');
+
+            new ClassPath('MyClass')
+                .getNamespace().should.be.equal('/');
+
+            new ClassPath('/MyClass')
+                .getNamespace().should.be.equal('/');
+        });
+    });
+
+    describe('#getNamespaceAsArray', function () {
+        it('should return the namespace as an array', function () {
+            var namespace = new ClassPath('Chromabits/Testing/MyClass')
+                .getNamespaceAsArray();
+
+            namespace[0].should.be.equal('Chromabits');
+            namespace[1].should.be.equal('Testing');
+
+            new ClassPath('MyClass')
+                .getNamespaceAsArray().length.should.be.equal(0);
+        });
+    });
+
+    describe('#isRelative', function () {
+        it('should return whether or not the path is relative', function () {
+            new ClassPath('Chromabits/Testing/MyClass')
+                .isRelative().should.be.true;
+
+            new ClassPath('/Chromabits/Testing/MyClass')
+                .isRelative().should.be.false;
+        });
+    });
+
+    describe('#isAbsolute', function () {
+        it('should return whether or not the path is relative', function () {
+            new ClassPath('Chromabits/Testing/MyClass')
+                .isAbsolute().should.be.false;
+
+            new ClassPath('/Chromabits/Testing/MyClass')
+                .isAbsolute().should.be.true;
         });
     });
 });

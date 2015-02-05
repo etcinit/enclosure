@@ -15,7 +15,8 @@
   "dependencies": {
     "ensure.js": "^0.5.3",
     "introspect": "0.0.3",
-    "retrieve-arguments": "^1.0.1"
+    "retrieve-arguments": "^1.0.1",
+    "walkdir": "0.0.7"
   },
   "devDependencies": {
     "istanbul": "^0.3.5",

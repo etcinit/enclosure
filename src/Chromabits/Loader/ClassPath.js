@@ -67,10 +67,10 @@ ClassPath.prototype.getNamespace = function () {
         var namespace = this.path.slice(0, this.path.length - 1);
 
         if (this.isAbsolute()) {
-            return '/' + namespace.join('/');
+            return '/' + namespace.join('/') + '/';
         }
 
-        return namespace.join('/');
+        return namespace.join('/') + '/';
     }
 
     return '/';
