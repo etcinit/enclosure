@@ -350,6 +350,8 @@ Container.prototype.setLoader = function (loader) {
     ensure(loader, Loader);
 
     this.loader = loader;
+
+    this.instance('Chromabits/Loader/Loader', loader);
 };
 
 module.exports = Container;
