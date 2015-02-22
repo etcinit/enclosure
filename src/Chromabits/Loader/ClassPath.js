@@ -92,4 +92,12 @@ ClassPath.prototype.isAbsolute = function () {
     return !this.relative;
 };
 
+ClassPath.prototype.toAbsolute = function () {
+    if (!this.isAbsolute()) {
+        return '/' + this.original;
+    }
+
+    return this.original;
+};
+
 module.exports = ClassPath;

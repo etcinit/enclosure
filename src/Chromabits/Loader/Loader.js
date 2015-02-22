@@ -1,6 +1,7 @@
 'use strict';
 
 var ensure = require('ensure.js'),
+    ClassPath = require('../Loader/ClassPath'),
     ClassNotFoundException = require('./Exceptions/ClassNotFoundException.js'),
     ClassMap = require('../Mapper/ClassMap.js');
 
@@ -39,12 +40,15 @@ Loader.prototype.addMap = function (map) {
  * @return {Function} -
  */
 Loader.prototype.get = function (fullClassName) {
+    var path = new ClassPath(fullClassName),
+        absoluteClassName = path.toAbsolute();
+
     for (var key in this.maps) {
         if (this.maps.hasOwnProperty(key)) {
             var map = this.maps[key];
 
-            if (map.has(fullClassName)) {
-                return map.get(fullClassName);
+            if (map.has(absoluteClassName)) {
+                return map.get(absoluteClassName);
             }
         }
     }
