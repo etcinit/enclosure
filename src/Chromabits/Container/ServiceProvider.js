@@ -9,7 +9,8 @@ var ServiceProvider;
  * @returns {undefined} -
  */
 ServiceProvider = function () {
-
+    this.booted = false;
+    this.registered = false;
 };
 
 /**
@@ -20,7 +21,7 @@ ServiceProvider = function () {
  * @returns {undefined} -
  */
 ServiceProvider.prototype.boot = function (app) {
-
+    //
 };
 
 /**

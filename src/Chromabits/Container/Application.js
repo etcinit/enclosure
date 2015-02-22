@@ -1,11 +1,19 @@
 'use strict';
 
 var ensure = require('ensure.js'),
+    R = require('ramda'),
     Container = require('./Container.js'),
     ServiceProvider = require('./ServiceProvider.js');
 
 var Application;
 
+/**
+ * Application
+ *
+ * An extension of the Container class with support for Service Providers
+ *
+ * @constructor
+ */
 Application = function () {
     // Call parent constructor
     Container.call(this, arguments);
@@ -45,12 +53,38 @@ Application.prototype.addProvider = function (provider) {
     this.providers.push(provider);
 };
 
+/**
+ * Boot all providers in the application
+ */
 Application.prototype.bootProviders = function () {
+    var self = this;
 
+    function bootProvider (provider) {
+        provider.boot(self);
+    }
+
+    function isBooted (provider) {
+        return !(provider.booted);
+    }
+
+    R.forEach(bootProvider, R.filter(isBooted));
 };
 
+/**
+ * Register all providers in the application
+ */
 Application.prototype.register = function () {
+    var self = this;
 
+    function registerProvider (provider) {
+        provider.register(self);
+    }
+
+    function isRegistered (provider) {
+        return !(provider.registered);
+    }
+
+    R.forEach(registerProvider, R.filter(isRegistered));
 };
 
 module.exports = Application;

@@ -15,6 +15,7 @@
   "dependencies": {
     "ensure.js": "^0.5.3",
     "introspect": "0.0.3",
+    "ramda": "^0.10.0",
     "retrieve-arguments": "^1.0.1",
     "walkdir": "0.0.7"
   },
