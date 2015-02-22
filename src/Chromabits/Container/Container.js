@@ -6,6 +6,7 @@ var Container,
     Loader = require('../Loader/Loader'),
 
     ensure = require('ensure.js'),
+    Nullable = ensure.Nullable,
     introspect = require('retrieve-arguments');
 
 /**
@@ -36,6 +37,13 @@ Container = function () {
      * @type {Array}
      */
     this.factories = [];
+
+    /**
+     * Abstract types that should be shared (singletons after built)
+     *
+     * @type {Array}
+     */
+    this.shared = [];
 
     this.buildStack = [];
 
@@ -95,8 +103,9 @@ Container.prototype.instance = function (abstract, instance) {
  *
  * @param abstract
  * @param concrete
+ * @param shared
  */
-Container.prototype.bind = function (abstract, concrete) {
+Container.prototype.bind = function (abstract, concrete, shared) {
     ensure(abstract, String);
     // TODO: Type-check concrete param once ensure.js supports Maybe
 
@@ -106,6 +115,10 @@ Container.prototype.bind = function (abstract, concrete) {
         || concrete instanceof Function
         || ensure.isString(concrete)) {
         this.bindings[abstract] = concrete;
+
+        if (shared) {
+            this.shared[abstract] = true;
+        }
 
         return;
     }
@@ -118,12 +131,17 @@ Container.prototype.bind = function (abstract, concrete) {
  *
  * @param abstract
  * @param concrete
+ * @param shared
  */
-Container.prototype.factory = function (abstract, concrete) {
+Container.prototype.factory = function (abstract, concrete, shared) {
     ensure(abstract, String);
     ensure(concrete, Function);
 
     this.factories[abstract] = concrete;
+
+    if (shared) {
+        this.shared[abstract] = true;
+    }
 };
 
 /**
@@ -184,7 +202,16 @@ Container.prototype.make = function (abstract) {
 
         // If buildable, build one
         if (this.isBuildable(concrete)) {
-            return this.build(concrete);
+            var instance = this.build(concrete);
+
+            // If the abstract type is marked as shared, we will cache the
+            // instance as a singleton so subsequent calls to make will return
+            // the same instance
+            if (abstract in this.shared) {
+                this.instance(abstract, instance);
+            }
+
+            return instance;
         }
     } catch (err) {
         // Fall back to building a class using the loader (if it is present)
