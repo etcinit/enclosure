@@ -67,7 +67,7 @@ Application.prototype.bootProviders = function () {
         return !(provider.booted);
     }
 
-    R.forEach(bootProvider, R.filter(isBooted));
+    R.forEach(bootProvider, R.filter(isBooted), this.providers);
 };
 
 /**
@@ -84,7 +84,7 @@ Application.prototype.register = function () {
         return !(provider.registered);
     }
 
-    R.forEach(registerProvider, R.filter(isRegistered));
+    R.forEach(registerProvider, R.filter(isRegistered, this.providers));
 };
 
 module.exports = Application;

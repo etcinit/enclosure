@@ -82,7 +82,9 @@ Container.prototype.bind = function (abstract, concrete) {
 
     // If the concrete implementation is either a string or a Wrap,
     // we just create a binding
-    if (concrete instanceof Wrap || concrete instanceof Function || ensure.isString(concrete)) {
+    if (concrete instanceof Wrap
+        || concrete instanceof Function
+        || ensure.isString(concrete)) {
         this.bindings[abstract] = concrete;
 
         return;
@@ -175,7 +177,10 @@ Container.prototype.build = function (concrete, parameters) {
 
         var factoryFunction = this.factories[concrete];
 
-        return factoryFunction.apply(Object.create(factoryFunction.prototype), factoryArguments);
+        return factoryFunction.apply(
+            Object.create(factoryFunction.prototype),
+            factoryArguments
+        );
     }
 
     this.buildStack.push(concrete);
@@ -184,7 +189,10 @@ Container.prototype.build = function (concrete, parameters) {
     // This could mean we have a circular dependency or a very complex
     // application
     if (this.buildStack.length > this.maxDepth) {
-        throw new Error('Max dependency depth reached. Possible circular dependency');
+        throw new Error(
+            'Max dependency depth reached.'
+            + 'Possible circular dependency'
+        );
     }
 
     // If the concrete is a Wrap object, we can resolve its dependencies
@@ -202,11 +210,15 @@ Container.prototype.build = function (concrete, parameters) {
 
         this.buildStack.pop();
 
-        return constructor.apply(Object.create(constructor.prototype), constructorArguments);
+        return constructor.apply(
+            Object.create(constructor.prototype),
+            constructorArguments
+        );
     }
 
-    // If the concrete is just a function, then we will assume it is a service constructor
-    // We will use introspection to find out which are its dependencies
+    // If the concrete is just a function, then we will assume it is a service
+    // constructor. We will use introspection to find out which are its
+    // dependencies
     if (concrete in this.bindings && this.bindings[concrete] instanceof Function) {
         var constructor = this.bindings[concrete];
 
@@ -216,7 +228,11 @@ Container.prototype.build = function (concrete, parameters) {
 
         // Do some magic to call new with a variable number of arguments
         // See http://stackoverflow.com/questions/1606797/use-of-apply-with-new-operator-is-this-possible
-        return new (Function.prototype.bind.apply(constructor, dependencies));
+        var instance = Object.create(constructor.prototype);
+
+        constructor.apply(instance, dependencies);
+
+        return instance;
     }
 
     throw new Error('Unable to resolve. The concrete type is not instantiable');
@@ -291,8 +307,9 @@ Container.prototype.isBuildable = function (concrete) {
     }
 
     // If we have a wrap or constructor, we can also build it
-    if (concrete in this.bindings &&
-        (this.bindings[concrete] instanceof Wrap) || (this.bindings[concrete] instanceof Function)) {
+    if (concrete in this.bindings
+        && (this.bindings[concrete] instanceof Wrap)
+        || (this.bindings[concrete] instanceof Function)) {
         return true;
     }
 
