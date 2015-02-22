@@ -3,6 +3,7 @@
 var Container,
 
     Wrap = require('./Wrap'),
+    Loader = require('../Loader/Loader'),
 
     ensure = require('ensure.js'),
     introspect = require('retrieve-arguments');
@@ -37,6 +38,13 @@ Container = function () {
     this.factories = [];
 
     this.buildStack = [];
+
+    /**
+     * Class loader
+     *
+     * @type {null|Loader}
+     */
+    this.loader = null;
 
     /**
      * The max depth dependencies will be explored
@@ -156,14 +164,24 @@ Container.prototype.make = function (abstract) {
     }
 
     // Get concrete
-    var concrete = this.getConcrete(abstract);
+    var concrete = abstract;
+    try {
+        concrete = this.getConcrete(abstract);
 
-    // If buildable, build one
-    if (this.isBuildable(concrete)) {
-        return this.build(concrete);
+        // If buildable, build one
+        if (this.isBuildable(concrete)) {
+            return this.build(concrete);
+        }
+    } catch (err) {
+        // Fall back to building a class using the loader (if it is present)
+        if (this.loader && this.loader.has(abstract)) {
+            return this.loader.get(abstract);
+        }
+
+        throw err;
     }
 
-    throw new Error('Unable to build dependency');
+    throw new Error('Unable to build abstract: ' + abstract);
 };
 
 Container.prototype.build = function (concrete, parameters) {
@@ -314,6 +332,17 @@ Container.prototype.isBuildable = function (concrete) {
     }
 
     return false;
+};
+
+/**
+ * Set the loader to use for automatic class loading and instantiation
+ *
+ * @param loader
+ */
+Container.prototype.setLoader = function (loader) {
+    ensure(loader, Loader);
+
+    this.loader = loader;
 };
 
 module.exports = Container;

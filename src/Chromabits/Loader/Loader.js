@@ -56,4 +56,21 @@ Loader.prototype.get = function (fullClassName) {
     throw new ClassNotFoundException(fullClassName);
 };
 
+Loader.prototype.has = function (fullClassName) {
+    var path = new ClassPath(fullClassName),
+        absoluteClassName = path.toAbsolute();
+
+    for (var key in this.maps) {
+        if (this.maps.hasOwnProperty(key)) {
+            var map = this.maps[key];
+
+            if (map.has(absoluteClassName)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+};
+
 module.exports = Loader;
