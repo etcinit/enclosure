@@ -175,7 +175,14 @@ Container.prototype.make = function (abstract) {
     } catch (err) {
         // Fall back to building a class using the loader (if it is present)
         if (this.loader && this.loader.has(abstract)) {
-            return this.loader.get(abstract);
+            var constructor = this.loader.get(abstract);
+            var dependencies = this.resolveDependencies(constructor);
+
+            var instance = Object.create(constructor.prototype);
+
+            constructor.apply(instance, dependencies);
+
+            return instance;
         }
 
         throw err;
