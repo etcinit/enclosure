@@ -125,7 +125,9 @@ Container.prototype.getConcrete = function (abstract) {
     // If the abstract is not defined in the bindings array
     // then we can't find a concrete, so we have to bail
     if (!(abstract in this.bindings) && !(abstract in this.factories)) {
-        throw new Error('Unable to resolve concrete type');
+        throw new Error(
+            'Unable to resolve concrete type: ' + abstract
+        );
     }
 
     if (abstract in this.bindings) {
