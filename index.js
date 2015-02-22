@@ -35,7 +35,7 @@ module.exports = {
             ClassMap: require('./src/Chromabits/Mapper/ClassMap.js'),
             DirectoryMapper:
                 require('./src/Chromabits/Mapper/DirectoryMapper.js'),
-            EnclosureMapper:
+            EnclosureClassMap:
                 require('./src/Chromabits/Mapper/EnclosureClassMap.js')
         }
     }
