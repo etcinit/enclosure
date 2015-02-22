@@ -41,7 +41,7 @@ Application.prototype.addProvider = function (provider) {
 
     // If a function is provided, it most likely means we need to create
     // an instance of the provider
-    if (ensure.isFunction(provider)) {
+    if (ensure(provider, Function, true)) {
         var Constructor = provider;
 
         provider = new Constructor(this);
