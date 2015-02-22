@@ -67,7 +67,7 @@ Application.prototype.bootProviders = function () {
         return !(provider.booted);
     }
 
-    R.forEach(bootProvider, R.filter(isBooted), this.providers);
+    R.forEach(bootProvider, R.filter(isBooted, this.providers));
 };
 
 /**
