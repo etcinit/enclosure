@@ -71,7 +71,19 @@ Container = function () {
  * @param instance
  */
 Container.prototype.instance = function (abstract, instance) {
-    this.instances[abstract] = instance;
+    // If the abstract is an array, we will assume it is an array of strings
+    // of each each abstract we want to bind the instance to
+    if (ensure.isArray(abstract)) {
+        abstract.forEach(function (single) {
+            ensure(single, String);
+
+            this.instances[single] = instance;
+        }.bind(this));
+    } else {
+        ensure(abstract, String);
+
+        this.instances[abstract] = instance;
+    }
 };
 
 /**
@@ -246,7 +258,10 @@ Container.prototype.build = function (concrete, parameters) {
     // If the concrete is just a function, then we will assume it is a service
     // constructor. We will use introspection to find out which are its
     // dependencies
-    if (concrete in this.bindings && this.bindings[concrete] instanceof Function) {
+    if (
+        concrete in this.bindings
+        && this.bindings[concrete] instanceof Function
+    ) {
         var constructor = this.bindings[concrete];
 
         var dependencies = this.resolveDependencies(constructor);
@@ -254,7 +269,7 @@ Container.prototype.build = function (concrete, parameters) {
         this.buildStack.pop();
 
         // Do some magic to call new with a variable number of arguments
-        // See http://stackoverflow.com/questions/1606797/use-of-apply-with-new-operator-is-this-possible
+        // See http://goo.gl/R7Dpt
         var instance = Object.create(constructor.prototype);
 
         constructor.apply(instance, dependencies);
@@ -354,6 +369,37 @@ Container.prototype.setLoader = function (loader) {
     this.loader = loader;
 
     this.instance('Chromabits/Loader/Loader', loader);
+};
+
+/**
+ * Load a class constructor
+ *
+ * A simple alias for the Loader's get method
+ *
+ * @param fullClassName
+ * @returns {Function}
+ */
+Container.prototype.use = function (fullClassName) {
+    if (this.loader) {
+        return this.loader.get(fullClassName);
+    }
+
+    throw new Error('This container does not have a loader attached');
+};
+
+/**
+ * Installs container shortcut properties into a specific object
+ *
+ * This is useful for making the container available on the global or window
+ * contexts.
+ *
+ * @param target
+ */
+Container.prototype.installTo = function (target) {
+    ensure(target, Object);
+
+    target.container = this;
+    target.use = this.use;
 };
 
 module.exports = Container;
