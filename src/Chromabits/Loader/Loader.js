@@ -39,9 +39,13 @@ Loader.prototype.addMap = function (map) {
  * @return {Function} -
  */
 Loader.prototype.get = function (fullClassName) {
-    for (var map in this.maps) {
-        if (map.has(fullClassName)) {
-            return map.get(fullClassName);
+    for (var key in this.maps) {
+        if (this.maps.hasOwnProperty(key)) {
+            var map = this.maps[key];
+
+            if (map.has(fullClassName)) {
+                return map.get(fullClassName);
+            }
         }
     }
 
