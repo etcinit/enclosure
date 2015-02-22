@@ -321,8 +321,6 @@ Container.prototype.resolveDependencies = function (construct) {
         dependenciesNames = construct.getDependencies();
     } else if (construct instanceof Function) {
         dependenciesNames = introspect(construct);
-    } else {
-        throw new Error('Expected either a Wrap or function');
     }
 
     dependenciesNames.forEach(function (dependencyName) {
