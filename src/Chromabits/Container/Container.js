@@ -399,7 +399,7 @@ Container.prototype.installTo = function (target) {
     ensure(target, Object);
 
     target.container = this;
-    target.use = this.use;
+    target.use = this.use.bind(this);
 };
 
 module.exports = Container;
