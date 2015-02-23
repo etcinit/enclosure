@@ -3,6 +3,7 @@
 var Container = require('./src/Chromabits/Container/Container'),
     Wrap = require('./src/Chromabits/Container/Wrap'),
     ClassMap = require('./src/Chromabits/Mapper/ClassMap.js'),
+    Loader = require('./src/Chromabits/Loader/Loader.js'),
     EnclosureClassMap = require('./src/Chromabits/Mapper/EnclosureClassMap.js'),
     DirectoryMapper = require('./src/Chromabits/Mapper/DirectoryMapper.js');
 
@@ -16,7 +17,10 @@ module.exports = {
     },
 
     bootstrapTo: function (target) {
-        target.use = EnclosureClassMap.get.bind(EnclosureClassMap);
+        var loader = new Loader();
+
+        loader.addMap(EnclosureClassMap);
+        target.use = loader.get.bind(loader);
 
         return this;
     },
@@ -38,7 +42,7 @@ module.exports = {
                 )
             },
             ClassPath: require('./src/Chromabits/Loader/ClassPath.js'),
-            Loader: require('./src/Chromabits/Loader/Loader.js')
+            Loader: Loader
         },
         Mapper: {
             AbstractMapper:
