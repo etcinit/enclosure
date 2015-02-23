@@ -1,5 +1,5 @@
 ![Logo](http://i.imgur.com/KXjzLDF.png)
-# Enclosure 
+# Enclosure ![Build Status](https://travis-ci.org/etcinit/enclosure.svg?branch=develop)
 
 A Javascript IOC container and module loading system
 
@@ -69,17 +69,33 @@ Currently, Enclosure only officially supports Node.js environments, mostly due t
 
 Additionally, when installing Enclosure to the global scope, the following variables are reserved: `container`, `use`
 
+## The Bootstrapper Component
+
+### First steps
+
+After installation, the first thing you'll probably want to do is use one of Enclosure's classes. On previous versions, these were inside the enclosure object itself (`enclosure.Container`). However, since newer versions include more classes, this method was dropped since it requires every file in enclosure when it is required.
+
+Instead, Enclosure makes use of it's own Loader component (the `use()` function) for getting classes. The initial bootstrap environment is only capable of resolving classes that are inside the library. 
+
+To initialize the bootstrap environment, just call the following function before any call to `use()`:
+
+```js
+require('enclosure').bootstrap();
+```
+
+See _The Loader Component_ below for more instructions on how to setup the Loader to load your own classes and how to use the `use()` function.
+
 ## The Container Component
 
 ### Getting started
 
-After installation, the next step is to create a container for your application and register services into it. You should install the container instance into the global variable (more on that below) or pass it along to your application components so that they can resolve dependencies from it.
+Once bootstrapped, the next step is to create a container for your application and register services into it. You should install the container instance into the global variable (more on that below) or pass it along to your application components so that they can resolve dependencies from it.
 
 ```js
-var enclosure = require('enclosure'),
+require('enclosure').bootstrap();
 
-	Container = enclosure.Container,
-	Wrap = enclosure.Wrap;
+var Container = use('Chromabits/Container/Container'),
+	Wrap = use('Chromabits/Container/Wrap');
 
 var app = new Container();
 ```
@@ -142,6 +158,14 @@ var ServiceThree = function (EnclosureContainer) {
 container.bind('ServiceThree', ServiceThree);
 ```
 
+#### Limitations
+
+EcmaScript does not allow slashes `/` as part of a parameter name, so as a workaround Enclosure's container can replace underscores `_` with `/` when resolving dependencies in constructors.
+
+Example: `Chromabits_Container_Container` becomes `Chromabits/Container/Container`
+
+If this syntax seems ugly or you need to minify your code, you can always just use Wraps (defined below).
+
 ### Factories
 
 Factory functions allow you to tell the container how to build a service for you. They are executed every time the container needs that service.
@@ -193,15 +217,278 @@ container.factory('ServiceFour', function () { ... }, true);
 
 ### Service Providers
 
-## The Loader Component
+As your application gets more complex, you will probably want to break down how you register services into the container and perhaps perform some setup task as the application prepares to run. This is possible using Service Providers.
 
-### Mappers
+Enclosure includes an extension of the Container class called Application. Application is still a container but it has support for handing service providers
+
+#### Example:
+
+Note: The loader component is explained in the section below.
+
+__src/app.js:__
+
+```js
+require('enclosure').bootstrap();
+
+var Application = use('Chromabits/Container/Application'),
+    Loader = use('Chromabits/Loader/Loader'),
+    DirectoryMapper = use('Chromabits/Mapper/DirectoryMapper'),
+    EnclosureMap = use('Chromabits/Mapper/EnclosureClassMap');
+
+// Setup class autoloading
+var loader = new Loader();
+var mapper = new DirectoryMapper(__dirname);
+
+loader.addMap(mapper.generate());
+loader.addMap(EnclosureMap);
+
+// Start the service container
+var application = new Application();
+
+application.setLoader(loader);
+application.installTo(global);
+
+// Register providers
+container.addProvider('Providers/HelloServiceProvider');
+
+// Register services and boot providers
+container.register();
+container.bootProviders();
+```
+
+__src/Providers/HelloServiceProvider.js:__
+
+```js
+var ServiceProvider = use('Chromabits/Container/ServiceProvider');
+
+var HelloServiceProvider = function () {
+    // Call parent constructor
+    ServiceProvider.call(this, arguments);
+}
+
+HelloServiceProvider.prototype = new ServiceProvider();
+
+// Here is where we register all services provided in this provider:
+HelloServiceProvider.prototype.register = function (app) {
+	app.bind('HelloWorld', function () {
+		return 'Hello World';
+	});
+};
+
+// Here we boot the services provided:
+HelloServiceProvider.prototype.boot = function (app) {
+	var hello = app.make('HelloWorld');
+	
+	// In this simple case we just call a simple function, but
+	// you get the idea
+	console.log(hello());
+};
+
+module.exports = HelloServiceProvider;
+```
+
+#### Example in ES6:
+
+The previous example can be rewritten in EcmaScript 6 for a much more simple syntax:
+
+__src/Providers/HelloServiceProvider.js:__
+
+```js
+var ServiceProvider = use('Chromabits/Container/ServiceProvider');
+
+class HelloServiceProvider extends ServiceProvider
+{
+    register (app) {
+	     app.bind('HelloWorld', function () {
+            return 'Hello World';
+        });
+    }
+    
+    boot (app) {
+        var hello = app.make('HelloWorld');
+	
+	    // In this simple case we just call a simple function, but
+	    // you get the idea
+	    console.log(hello());
+    }
+}
+
+module.exports = HelloServiceProvider;
+```
+
+Enclosure works with transpilers like Babel, so you can use ES6 right now
+
+## The Loader Component
 
 ### Class Maps
 
+Enclosure has the concept of a Class Map, which is a simple class capable of mapping a full class name into a function or a JavaScript file.
+
+In most cases, you'll probably won't have to deal with ClassMaps directly, but instead use Mappers (explained below).
+
+#### Class names
+
+The class name convention for Enclosure is borrowed from PHP namespaces, with foward-slashes instead of back-slashes as path separators.
+
+_Valid:_
+
+- `Example/Services/Mailer`
+- `/Example/App`
+- `/Server`
+- `Database`
+
+_Invalid:_
+
+- `\..\App`
+- `app.js`
+- `Example/++/Mailer`
+- and many more...
+
+#### EnclosureClassMap
+
+A class map with all Enclosure classes is available as `Chromabits/Mapper/EnclosureClassMap`. This is the map used by the bootstrap environment. However, as soon as you setup your own class loader, Enclosure classes will not be available anymore unless you add this map into your loader.
+
+### Mappers
+
+The first step twords automatic class loading is to use a Mapper. In Enclosure, a Mapper is basically just a factory capable of creating a class map. If you would like to create your own, just extend the `AbstractMapper` class. However, most people will probably just want ot use the `DirectoryMapper` which generates a class map by looking at a directory structure.
+
+#### DirectoryMapper
+
+Consider the following project structure:
+
+```
+src/
+    app.js
+    Mailer.js
+    Database/
+        Post.js
+    Controllers/
+        ContactController.js
+```
+
+__src/app.js:__
+
+```js
+require('enclosure').bootstrap();
+
+var DirectoryMapper = use('Chromabits/Mapper/DirectoryMapper');
+
+var mapper = new DirectoryMapper(__dirname);
+
+// Generate the class map
+var map = mapper.generate();
+```
+
+The generated map in this case will contain the following files:
+
+- `app`
+- `Mailer`
+- `Database/Post`
+- `Controllers/ContactController`
+
+### Containers and Loaders
+
+The last piece of the puzzle is Loaders. Loaders are just classes that group a bunch of class maps together and are able to tell if they can resolve a certain class:
+
+```js
+require('enclosure').bootstrap();
+
+var Container = use('Chromabits/Container/Container'),
+    Loader = use('Chromabits/Loader/Loader'),
+    DirectoryMapper = use('Chromabits/Mapper/DirectoryMapper'),
+    EnclosureMap = use('Chromabits/Mapper/EnclosureClassMap');
+
+// Setup class autoloading
+var loader = new Loader();
+var mapper = new DirectoryMapper(__dirname);
+
+loader.addMap(mapper.generate()); // Adds app classes
+loader.addMap(EnclosureMap); // Adds enclosure classes
+
+loader.has('Chromabits/Container/Application') 
+>>> true
+
+loader.has('Example/Fake') 
+>>> false
+```
+
+A Container can be made more useful by attaching a Loader to it. This will allow it to resolve classes out of the loader if there are no services implementing them:
+
+```js
+// Start the service container
+var container = new Container();
+
+container.setLoader(loader);
+
+container.installTo(global);
+```
+
+__IMPORTANT:__ `setLoader` should be called before `installTo`. Otherwise, the `use()` is not defined/replaced in the target object.
+
+### Putting it all together
+
+Below is a full example of the previous components:
+
+__src/app.js:__
+
+```js
+require('enclosure').bootstrap();
+
+var Container = use('Chromabits/Container/Container'),
+    Loader = use('Chromabits/Loader/Loader'),
+    DirectoryMapper = use('Chromabits/Mapper/DirectoryMapper'),
+    EnclosureMap = use('Chromabits/Mapper/EnclosureClassMap');
+
+// Setup class autoloading
+var loader = new Loader();
+var mapper = new DirectoryMapper(__dirname);
+
+loader.addMap(mapper.generate());
+loader.addMap(EnclosureMap);
+
+// Start the service container
+var container = new Container();
+
+container.setLoader(loader);
+container.installTo(global);
+
+// World should be resolved automatically in Hello
+// Also, note that we never registered Hello or World as services
+var hello = container.make('Hello');
+
+console.log(hello.say());
+>>> 'hello world'
+```
+
+__src/Hello.js:__
+
+```js
+var Hello = function (World) {
+    this.text = 'hello' + World.say();
+};
+
+Hello.prototype.say = function () {
+	return this.text;
+};
+
+module.export = Hello;
+```
+
+__src/World.js:__
+
+```js
+var World = function () {};
+
+World.prototype.say = function () {
+	return 'world';
+};
+
+module.exports = World;
+```
+
 ### use() vs require()
 
-If you installed the container globally, you can use the `use()` function as a replacement of `require()`. This function is also available as `container.use()`.
+If you installed the container globally (`installTo(global)`), you can use the `use()` function as a replacement of `require()`. This function is also available as `container.use()`.
 
 The main difference between `require` and `use` is that `use` uses your container's loader to find classes. This has the benefit that you can require classes and objects using an absolute path rather than a relative one.
 
@@ -241,4 +528,16 @@ Please note that this function does not construct an instance. It actually retur
 
 ### Automatic construction
 
-## The Bootstrapper Component
+As shown in the complete example above, the Container is capable of using a Loader to try to resolve services that are not explicitly binded. Dependency Injection is also performed during this process. So you can use classes with dependencies as services without having to register them. 
+
+Continuing the previous example:
+
+```js
+// This gets the constructor function
+var Mailer = use('Mailer');
+>>> [Function]
+
+// This gets an instance
+var mailer = container.make('Mailer');
+>>> Object
+```

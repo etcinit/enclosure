@@ -1,11 +1,10 @@
 'use strict';
 
-var enclosure = require('../../index.js'),
-    path = require('path');
+var path = require('path');
 
-var AbstractMapper = enclosure.Chromabits.Mapper.AbstractMapper,
-    DirectoryMapper = enclosure.Chromabits.Mapper.DirectoryMapper,
-    ClassMap = enclosure.Chromabits.Mapper.ClassMap;
+var AbstractMapper = require('../../src/Chromabits/Mapper/AbstractMapper'),
+    DirectoryMapper = require('../../src/Chromabits/Mapper/DirectoryMapper'),
+    ClassMap = require('../../src/Chromabits/Mapper/ClassMap');
 
 describe('DirectoryMapper', function () {
     it('should be a constructor', function () {
