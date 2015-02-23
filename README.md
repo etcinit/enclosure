@@ -1,4 +1,4 @@
-![Logo](http://i.imgur.com/KXjzLDF.png)
+![Logo](http://i.imgur.com/qAoBgMP.png)
 # Enclosure ![Build Status](https://travis-ci.org/etcinit/enclosure.svg?branch=develop)
 
 A Javascript IOC container and module loading system
