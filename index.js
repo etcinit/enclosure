@@ -19,6 +19,8 @@ module.exports = {
         var classMap = new EnclosureClassMap();
 
         target.use = classMap.get;
+
+        return this;
     },
 
     // Use a more namespace-ish object for everything else
