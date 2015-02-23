@@ -1,6 +1,6 @@
 {
   "name": "enclosure",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "IOC Container",
   "main": "index.js",
   "repository": {
@@ -11,7 +11,7 @@
     "test": "mocha test/ test/**/*.js"
   },
   "author": "Eduardo Trujillo <ed@chromabits.com> (http://chromabits.com/)",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "ensure.js": "^0.5.3",
     "introspect": "0.0.3",
