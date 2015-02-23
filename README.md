@@ -179,6 +179,20 @@ var myServiceWrap = new Wrap(
 container.bind('ServiceOne', myServiceWrap);
 ```
 
+### Shared Services
+
+Shared services are services that become singletons once they are built. This means that if the service is never requested it will never be instantiated. However, if it is, the instance will be cached and returned on every subsequent `make` call. 
+
+Shared services can be defined by providing a thrid parameter to `container.bind` and `container.factory`:
+
+```js
+container.bind('ServiceOne', myServiceWrap, true);
+
+container.factory('ServiceFour', function () { ... }, true);
+```
+
+### Service Providers
+
 ## The Loader Component
 
 ### Mappers
@@ -187,6 +201,44 @@ container.bind('ServiceOne', myServiceWrap);
 
 ### use() vs require()
 
-If you installed the container globally, you can use the `use()` function as a replacement of `require()` (This function is also available as `container.use()`).
+If you installed the container globally, you can use the `use()` function as a replacement of `require()`. This function is also available as `container.use()`.
+
+The main difference between `require` and `use` is that `use` uses your container's loader to find classes. This has the benefit that you can require classes and objects using an absolute path rather than a relative one.
+
+For example, consider the following structure:
+
+```
+src/
+    Mailer.js
+    Controllers/
+        ContactController.js
+```
+
+If we needed to use `Mailer` inside the contact controller, we would normally write something like:
+
+```js
+var Mailer = require('../Mailer');
+```
+However, with Enclosure we can use the following syntax (Assuming you setup a class mapper with `src` as the base directory):
+
+```js
+var Mailer = use('Mailer');
+```
+
+If we move the controller file into another directory, such as `src/Controllers/Front/`:
+
+```js
+// This now breaks:
+var Mailer = require('../Mailer');
+// and has to be changed to this:
+var Mailer = require('../../Mailer');
+
+// However, this still works:
+var Mailer = use('Mailer');
+```
+
+Please note that this function does not construct an instance. It actually returns the constructor function (or whatever you exported in your module). If you would like to create an instance, see automatic construction below.
 
 ### Automatic construction
+
+## The Bootstrapper Component
