@@ -1,4 +1,5 @@
-# Enclosure [![Build Status](https://travis-ci.org/eduard44/enclosure.svg?branch=master)](https://travis-ci.org/eduard44/enclosure)
+![Logo](http://i.imgur.com/KXjzLDF.png)
+# Enclosure [![Build Status](https://travis-ci.org/etcinit/enclosure.svg?branch=master)](https://travis-ci.org/etcinit/enclosure)
 
 A Javascript IOC container and module loading system
 
@@ -10,12 +11,12 @@ This library is still a work in progress. The main goal is to build some basic t
 
 - A complete service/IOC container
 	- [X] Singleton services
-	- [ ] Shared services (cached services)
+	- [X] Shared services (cached services)
 	- [X] Factory functions
-	- [ ] Service providers, which could be defined inside `package.json` or a `providers.json` and be automatically loaded by the container
+	- [ ] Service providers, which could be defined inside `package.json` or a `providers.json` and be automatically loaded by the container (In progress)
 - An alternative to Node's `require` function
-	- [ ] Abstract the process of requiring modules from the filesystem
-	- [ ] Introduce something losely similar to namespaces from other languages. Namespaces would be defined based on the filepath in the project: `src/Chromabits/Mailer/MandrillMailer.js` should be accessible by doing something like `var MandrilMailer = use('Chromabits/Mailer/MandrillMailer')`.
+	- [X] Abstract the process of requiring modules from the filesystem
+	- [X] Introduce something losely similar to namespaces from other languages. Namespaces would be defined based on the filepath in the project: `src/Chromabits/Mailer/MandrillMailer.js` should be accessible by doing something like `var MandrilMailer = use('Chromabits/Mailer/MandrillMailer')`.
 	- [ ] Introduce a new `namespace` key to `package.json` which would be parsed by the Enclosure loader in order to figure out namespace to filesystem mappings.
 
 ## Current status
@@ -24,7 +25,12 @@ There is a basic implementation of the Container and Wrap classes (Wraps are exp
 The container should allow defining singletons, services built by factory functions, and "Wrapped" services.
 It will also detect circular dependencies. 
 
-TODO: The Loader system, advanced container features (Shared services, Service providers)
+The Application class, which is extension of the Container class, is capable of loading service providers,
+registering them and booting them.
+
+The loader system is sort of working but requires more extensive testing. 
+
+TODO: Testing, defining things in package.json, better bootstrap experience
 
 ## Usage
 
