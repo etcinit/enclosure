@@ -16,9 +16,7 @@ module.exports = {
     },
 
     bootstrapTo: function (target) {
-        var classMap = new EnclosureClassMap();
-
-        target.use = classMap.get;
+        target.use = EnclosureClassMap.get;
 
         return this;
     },
