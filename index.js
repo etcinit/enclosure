@@ -3,12 +3,23 @@
 var Container = require('./src/Chromabits/Container/Container'),
     Wrap = require('./src/Chromabits/Container/Wrap'),
     ClassMap = require('./src/Chromabits/Mapper/ClassMap.js'),
+    EnclosureClassMap = require('./src/Chromabits/Mapper/EnclosureClassMap.js'),
     DirectoryMapper = require('./src/Chromabits/Mapper/DirectoryMapper.js');
 
 module.exports = {
     // Keep backwards compatibility
     Container: Container,
     Wrap: Wrap,
+
+    bootstrap: function () {
+        return this.bootstrapTo(global);
+    },
+
+    bootstrapTo: function (target) {
+        var classMap = new EnclosureClassMap();
+
+        target.use = classMap.get;
+    },
 
     // Use a more namespace-ish object for everything else
     Chromabits: {
