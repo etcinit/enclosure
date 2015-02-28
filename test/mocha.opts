@@ -1,3 +1,3 @@
---require should
+--require test/bootstrap
 --slow 20
 --growl

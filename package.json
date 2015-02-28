@@ -2,13 +2,15 @@
   "name": "enclosure",
   "version": "0.1.0",
   "description": "IOC Container",
-  "main": "index.js",
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/eduard44/enclosure.git"
+    "url": "https://github.com/etcinit/enclosure.git"
   },
   "scripts": {
-    "test": "mocha test/ test/**/*.js"
+    "test": "mocha test/ test/**/*.js",
+    "compile": "babel -d lib/ src/",
+    "prepublish": "npm run compile"
   },
   "author": "Eduardo Trujillo <ed@chromabits.com> (http://chromabits.com/)",
   "license": "MIT",
@@ -20,6 +22,8 @@
     "walkdir": "0.0.7"
   },
   "devDependencies": {
+    "babel": "^4.6.1",
+    "core-js": "^0.6.1",
     "istanbul": "^0.3.5",
     "mocha": "^2.1.0",
     "should": "^4.4.2"

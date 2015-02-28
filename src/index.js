@@ -1,9 +1,9 @@
 'use strict';
 
-var Container = require('./src/Chromabits/Container/Container'),
-    Wrap = require('./src/Chromabits/Container/Wrap'),
-    Loader = require('./src/Chromabits/Loader/Loader.js'),
-    EnclosureClassMap = require('./src/Chromabits/Mapper/EnclosureClassMap.js');
+var Container = require('./Chromabits/Container/Container'),
+    Wrap = require('./Chromabits/Container/Wrap'),
+    Loader = require('./Chromabits/Loader/Loader.js'),
+    EnclosureClassMap = require('./Chromabits/Mapper/EnclosureClassMap.js');
 
 module.exports = {
     // Keep backwards compatibility
