@@ -3,7 +3,8 @@
 let walkdir = require('walkdir'),
     path = require('path');
 
-let AbstractMapper = require('./AbstractMapper.js'),
+let ArrayUtils = require('../Util/ArrayUtils.js'),
+    AbstractMapper = require('./AbstractMapper.js'),
     ClassMap = require('./ClassMap.js');
 
 /**
@@ -82,12 +83,11 @@ class DirectoryMapper extends AbstractMapper
      *
      * @param filePath
      * @param extensions
-     * @returns {boolean}
+     * @returns {boolean|string}
      */
     static matchesFileType (filePath, extensions = ['.js'])
     {
-        var match = false;
-        extensions.forEach(function (extension) {
+        return ArrayUtils.forEachUntil(extensions, (extension) => {
             // Skip this extension if the actual path is shorter
             if (filePath.length > extension.length) {
                 return;
@@ -95,11 +95,9 @@ class DirectoryMapper extends AbstractMapper
 
             // Check if this extension matches
             if (filePath.slice(-(extension.length)) === extension) {
-                match = filePath;
+                return filePath;
             }
-        });
-
-        return match;
+        }, false);
     }
 }
 

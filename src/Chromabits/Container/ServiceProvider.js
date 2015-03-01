@@ -1,47 +1,56 @@
 'use strict';
 
-var ServiceProvider;
+let NotImplementedException = require(
+    '../Exceptions/NotImplementedException.js'
+);
 
 /**
- * A service provider is a class capable of registering services into the
- * Enclosure container.
+ * Class ServiceProvider
  *
- * @returns {undefined} -
+ * A service provider is an object capable of registering services into an
+ * Enclosure Application or Container
  */
-ServiceProvider = function () {
-    this.booted = false;
-    this.registered = false;
-};
+class ServiceProvider
+{
+    /**
+     * Construct an instance of a ServiceProvider
+     */
+    constructor ()
+    {
+        this.booted = false;
+        this.registered = false;
+        this.deferred = false;
+    }
 
-/**
- * Boot the provider
- *
- * @param {Container} app - The current instance of the container
- *
- * @returns {undefined} -
- */
-ServiceProvider.prototype.boot = function (app) {
-    //
-};
+    /**
+     * Boot the provider
+     *
+     * @param {Container} app - The current instance of the container
+     */
+    boot (app)
+    {
+        //
+    }
 
-/**
- * Register services into the container
- *
- * @param {Container} app = The current instance of the container
- *
- * @returns {undefined} -
- */
-ServiceProvider.prototype.register = function (app) {
-    throw new Error('A provider must implement the register method');
-};
+    /**
+     * Register services into the container
+     *
+     * @param {Container} app = The current instance of the container
+     */
+    register (app)
+    {
+        throw new NotImplementedException('register()');
+    }
 
-/**
- * Return an array of services provided
- *
- * @return {Array} -
- */
-ServiceProvider.prototype.provides = function () {
-    return [];
-};
+    /**
+     * Return an array of services provided
+     *
+     * @returns {Array}
+     */
+    provides ()
+    {
+        return [];
+    }
+}
 
 module.exports = ServiceProvider;

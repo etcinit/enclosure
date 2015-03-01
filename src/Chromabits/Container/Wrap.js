@@ -1,9 +1,8 @@
-"use strict";
+'use strict';
 
-var Wrap,
+let ensure = require('ensure.js');
 
-    ensure = require('ensure.js'),
-    Nullable = ensure.Nullable;
+let Nullable = ensure.Nullable;
 
 /**
  * Dependency wrapper for the Enclosure container
@@ -13,37 +12,45 @@ var Wrap,
  * instance of the container that is resolving the class
  * followed by instances of every dependency in the order
  * they are specified in the dependencies array
- *
- * @param dependencies
- * @param constructor
- * @constructor
  */
-Wrap = function (dependencies, constructor) {
-    ensure(dependencies, Nullable(Array));
-    ensure(constructor, Function);
+class Wrap
+{
+    /**
+     * Construct an instance of a Wrap
+     *
+     * @param dependencies
+     * @param constructor
+     */
+    constructor (dependencies, constructor)
+    {
+        ensure(dependencies, Nullable(Array));
+        ensure(constructor, Function);
 
-    this.dependencies = dependencies || [];
+        this.dependencies = dependencies || [];
 
-    this.constructor = constructor;
-};
+        this.constructor = constructor;
+    }
 
-/**
- * Get an array of strings specifying the dependencies required
- * by this class/module
- *
- * @returns {*|Array}
- */
-Wrap.prototype.getDependencies = function () {
-    return this.dependencies;
-};
+    /**
+     * Get an array of strings specifying the dependencies required
+     * by this class/module
+     *
+     * @returns {*|Array}
+     */
+    getDependencies ()
+    {
+        return this.dependencies;
+    }
 
-/**
- * Get the constructor function of the class/module
- *
- * @returns {*}
- */
-Wrap.prototype.getConstructor = function () {
-    return this.constructor;
-};
+    /**
+     * Get the constructor function of the class/module
+     *
+     * @returns {*}
+     */
+    getConstructor ()
+    {
+        return this.constructor;
+    }
+}
 
 module.exports = Wrap;

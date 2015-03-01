@@ -1,5 +1,9 @@
 'use strict';
 
+let NotImplementedException = require(
+    '../Exceptions/NotImplementedException.js'
+);
+
 /**
  * Class AbstractMapper
  *
@@ -19,9 +23,7 @@ class AbstractMapper
      */
     generate ()
     {
-        throw new Error(
-            'Every Enclosure mapper should implement the generate() method'
-        );
+        throw new NotImplementedException('generate()');
     }
 }
 

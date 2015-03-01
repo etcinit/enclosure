@@ -1,103 +1,173 @@
-"use strict";
+'use strict';
 
-var ClassPath,
+let ensure = require('ensure.js');
 
-    ensure = require('ensure.js');
+let InvalidClassPathException = require(
+    './Exceptions/InvalidClassPathException'
+);
 
-ClassPath = function (path) {
-    ensure(path, String);
+/**
+ * Class ClassPath
+ *
+ * Parses and extracts information about an Enclosure class path
+ */
+class ClassPath
+{
+    /**
+     * Construct an instance of a ClassPath
+     *
+     * @param path
+     */
+    constructor (path)
+    {
+        ensure(path, String);
 
-    this.original = path;
+        this.original = path;
+        this.relative = false;
+        this.path = [];
 
-    this.relative = false;
+        /**
+         * Namespace Regular Expression
+         *
+         * This is the expression which defines what is a class namespace
+         * and what isn't
+         *
+         * @type {RegExp}
+         */
+        this.fullyQualifiedNamespaceRegex =
+            /^([/]?)([A-Za-z]+[/])*([A-Za-z]+)$/;
 
-    this.path = [];
+        this.parse();
+    }
 
     /**
-     * Namespace Regular Expression
+     * Check if the class path is valid
      *
-     * This is the expression which defines what is a class namespace and what isn't
-     *
-     * @type {RegExp}
+     * @returns {Array|{index: number, input: string}}
      */
-    this.fullyQualifiedNamespaceRegex = /^([/]?)([A-Za-z]+[/])*([A-Za-z]+)$/;
-
-    this.parse();
-};
-
-ClassPath.prototype.isValid = function () {
-    return this.original.match(this.fullyQualifiedNamespaceRegex);
-};
-
-ClassPath.prototype.parse = function () {
-    var original = this.original;
-
-    // Check if the classpath string is valid
-    if (!this.isValid()) {
-        throw new Error('ClassPath is not valid');
+    isValid ()
+    {
+        return this.original.match(this.fullyQualifiedNamespaceRegex);
     }
 
-    this.relative = true;
+    /**
+     * Internally parse the path
+     */
+    parse ()
+    {
+        let original = this.original;
 
-    // Check whether or not the class path is relative or absolute
-    if (original[0] === '/') {
-        this.relative = false;
-
-        original = original.substr(1);
-    }
-
-    // Tokenize the path so that it is easier to process
-    this.path = original.split('/');
-};
-
-ClassPath.prototype.toString = function () {
-    if (this.relative) {
-        return this.path.join('/');
-    }
-
-    return '/' + this.path.join('/');
-};
-
-ClassPath.prototype.getClassName = function () {
-    return this.path[this.path.length - 1];
-};
-
-ClassPath.prototype.getNamespace = function () {
-    if (this.path.length > 1) {
-        var namespace = this.path.slice(0, this.path.length - 1);
-
-        if (this.isAbsolute()) {
-            return '/' + namespace.join('/') + '/';
+        // Check if the classpath string is valid
+        if (!this.isValid()) {
+            throw new InvalidClassPathException();
         }
 
-        return namespace.join('/') + '/';
+        this.relative = true;
+
+        // Check whether or not the class path is relative or absolute
+        if (original[0] === '/') {
+            this.relative = false;
+
+            original = original.substr(1);
+        }
+
+        // Tokenize the path so that it is easier to process
+        this.path = original.split('/');
     }
 
-    return '/';
-};
+    /**
+     * Get the path as a string
+     *
+     * @returns {string}
+     */
+    toString ()
+    {
+        if (this.relative) {
+            return this.path.join('/');
+        }
 
-ClassPath.prototype.getNamespaceAsArray = function () {
-    if (this.path.length > 1) {
-        return this.path.slice(0, this.path.length - 1);
+        return '/' + this.path.join('/');
     }
 
-    return [];
-};
-
-ClassPath.prototype.isRelative = function () {
-    return this.relative;
-};
-
-ClassPath.prototype.isAbsolute = function () {
-    return !this.relative;
-};
-
-ClassPath.prototype.toAbsolute = function () {
-    if (!this.isAbsolute()) {
-        return '/' + this.original;
+    /**
+     * Get the name of the class
+     *
+     * @returns {*}
+     */
+    getClassName ()
+    {
+        return this.path[this.path.length - 1];
     }
 
-    return this.original;
-};
+    /**
+     * Get the namespace part of the path
+     *
+     * @returns {string}
+     */
+    getNamespace ()
+    {
+        if (this.path.length > 1) {
+            let namespace = this.path.slice(0, this.path.length - 1);
+
+            if (this.isAbsolute()) {
+                return '/' + namespace.join('/') + '/';
+            }
+
+            return namespace.join('/') + '/';
+        }
+
+        return '/';
+    }
+
+    /**
+     * Get the namespace part of the path as an array
+     *
+     * @returns {*}
+     */
+    getNamespaceAsArray ()
+    {
+        if (this.path.length > 1) {
+            return this.path.slice(0, this.path.length - 1);
+        }
+
+        return [];
+    }
+
+    /**
+     * Get whether or not the path is relative
+     *
+     * @returns {ClassPath.relative|*}
+     */
+    isRelative ()
+    {
+        return this.relative;
+    }
+
+    /**
+     * Get whether or not the path is absolute
+     *
+     * @returns {boolean}
+     */
+    isAbsolute ()
+    {
+        return !this.relative;
+    }
+
+    /**
+     * Attempt to make the path absolute
+     *
+     * @returns {*}
+     */
+    toAbsolute ()
+    {
+        // The current implementation is nothing fancy. It just appends a
+        // slash if it is absolute
+        if (!this.isAbsolute()) {
+            return '/' + this.original;
+        }
+
+        return this.original;
+    }
+}
 
 module.exports = ClassPath;
