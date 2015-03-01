@@ -1,6 +1,6 @@
 'use strict';
 
-var Container = require('./Chromabits/Container/Container'),
+let Container = require('./Chromabits/Container/Container'),
     Wrap = require('./Chromabits/Container/Wrap'),
     Loader = require('./Chromabits/Loader/Loader.js'),
     EnclosureClassMap = require('./Chromabits/Mapper/EnclosureClassMap.js');
@@ -18,7 +18,7 @@ module.exports = {
      *
      * @returns {*}
      */
-    bootstrap: function () {
+    prelude: function () {
         return this.bootstrapTo(global);
     },
 
@@ -30,7 +30,7 @@ module.exports = {
      *
      * @returns {*}
      */
-    bootstrapTo: function (target) {
+    preludeTo: function (target) {
         var loader = new Loader();
 
         loader.addMap(EnclosureClassMap);

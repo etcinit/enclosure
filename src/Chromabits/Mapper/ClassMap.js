@@ -24,6 +24,14 @@ class ClassMap
         this.constructors = {};
     }
 
+    /**
+     * Add a file mapping
+     *
+     * The provided file should export the constructor of the class
+     *
+     * @param fullClassName
+     * @param filePath
+     */
     addFile (fullClassName, filePath)
     {
         ensure(fullClassName, String);
@@ -32,6 +40,14 @@ class ClassMap
         this.files[fullClassName] = filePath;
     }
 
+    /**
+     * Add a function mapping
+     *
+     * The provided function should be the constructor of the class
+     *
+     * @param fullClassName
+     * @param constructor
+     */
     addConstructor (fullClassName, constructor)
     {
         ensure(fullClassName, String);
@@ -40,6 +56,12 @@ class ClassMap
         this.constructors[fullClassName] = constructor;
     }
 
+    /**
+     * Get the constructor of the provided class
+     *
+     * @param fullClassName
+     * @returns {*}
+     */
     get (fullClassName)
     {
         if (fullClassName in this.constructors) {
@@ -53,6 +75,12 @@ class ClassMap
         throw new Error('Class not defined in this map object');
     }
 
+    /**
+     * Check if this map contains a class
+     *
+     * @param fullClassName
+     * @returns {boolean}
+     */
     has (fullClassName)
     {
         if (fullClassName in this.constructors || fullClassName in this.files) {

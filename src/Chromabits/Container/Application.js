@@ -1,90 +1,94 @@
 'use strict';
 
-var ensure = require('ensure.js'),
-    R = require('ramda'),
-    Container = require('./Container.js'),
+let ensure = require('ensure.js'),
+    R = require('ramda');
+
+let Container = require('./Container.js'),
     ServiceProvider = require('./ServiceProvider.js');
 
-var Application;
-
 /**
- * Application
+ * Class Application
  *
- * An extension of the Container class with support for Service Providers
- *
- * @constructor
+ * An extension of the Container class capable of handling and initializing
+ * Service Providers
  */
-Application = function () {
-    // Call parent constructor
-    Container.call(this, arguments);
+class Application extends Container
+{
+    /**
+     * Construct an instance of an Application
+     */
+    constructor()
+    {
+        // Call parent constructor
+        super();
 
-    // Initialize properties
-    this.providers = [];
-};
-
-// Inherit enclosure.Container
-Application.prototype = new Container();
-
-/**
- * Add a provider to the application
- *
- * @param {String|Function|ensure.ServiceProvider} provider -
- *
- * @returns {undefined} =
- */
-Application.prototype.addProvider = function (provider) {
-    // If a string is provided, we need to resolve the provider from the
-    // container and then try to instantiate it
-    if (ensure.isString(provider)) {
-        provider = this.make(provider);
+        // Initialize properties
+        this.providers = [];
     }
 
-    // If a function is provided, it most likely means we need to create
-    // an instance of the provider
-    if (ensure(provider, Function, true)) {
-        var Constructor = provider;
+    /**
+     * Add a provider to the application
+     *
+     * @param {String|Function|ServiceProvider} provider
+     */
+    addProvider (provider)
+    {
+        // If a string is provided, we need to resolve the provider from the
+        // container and then try to instantiate it
+        if (ensure.isString(provider)) {
+            provider = this.make(provider);
+        }
 
-        provider = new Constructor(this);
+        // If a function is provided, it most likely means we need to create
+        // an instance of the provider
+        if (ensure(provider, Function, true)) {
+            var Constructor = provider;
+
+            provider = new Constructor(this);
+        }
+
+        // Finally, check that the object is actually a service provider
+        // instance
+        ensure(provider, ServiceProvider);
+
+        this.providers.push(provider);
     }
 
-    // Finally, check that the object is actually a service provider instance
-    ensure(provider, ServiceProvider);
+    /**
+     * Boot all providers in the application
+     */
+    bootProviders ()
+    {
+        var self = this;
 
-    this.providers.push(provider);
-};
+        function bootProvider (provider) {
+            provider.boot(self);
+        }
 
-/**
- * Boot all providers in the application
- */
-Application.prototype.bootProviders = function () {
-    var self = this;
+        function isBooted (provider) {
+            return !(provider.booted);
+        }
 
-    function bootProvider (provider) {
-        provider.boot(self);
+        R.forEach(bootProvider, R.filter(isBooted, this.providers));
     }
 
-    function isBooted (provider) {
-        return !(provider.booted);
+    /**
+     * Register all providers in the application
+     */
+    register ()
+    {
+        var self = this;
+
+        function registerProvider (provider) {
+            provider.register(self);
+        }
+
+        function isRegistered (provider) {
+            return !(provider.registered);
+        }
+
+        R.forEach(registerProvider, R.filter(isRegistered, this.providers));
     }
-
-    R.forEach(bootProvider, R.filter(isBooted, this.providers));
-};
-
-/**
- * Register all providers in the application
- */
-Application.prototype.register = function () {
-    var self = this;
-
-    function registerProvider (provider) {
-        provider.register(self);
-    }
-
-    function isRegistered (provider) {
-        return !(provider.registered);
-    }
-
-    R.forEach(registerProvider, R.filter(isRegistered, this.providers));
-};
+}
 
 module.exports = Application;

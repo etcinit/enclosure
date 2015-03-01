@@ -11,8 +11,6 @@ let DirectoryMapper = require('./DirectoryMapper');
  *
  * @type {DirectoryMapper}
  */
-let mapper = new DirectoryMapper(
-    path.resolve(__dirname, '../../')
-);
+let mapper = new DirectoryMapper(path.resolve(__dirname, '../../'));
 
 module.exports = mapper.generate();
