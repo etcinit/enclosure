@@ -29,12 +29,14 @@ This library is still a work in progress. The main goal is to build some basic t
 	- [X] Shared services (cached services)
 	- [X] Factory functions
 	- [X] Service providers
-	  [ ] Deferred services providers
-	  [ ] which could be defined inside `package.json` or a `providers.json` and be automatically loaded by the container (In progress)
+	- [ ] Deferred services providers
+	- [ ] Load providers defined in `package.json`
 - An alternative to Node's `require` function
 	- [X] Abstract the process of requiring modules from the filesystem
 	- [X] Introduce something loosely similar to namespaces from other languages. Namespaces would be defined based on the file path in the project: `src/Chromabits/Mailer/MandrillMailer.js` should be accessible by doing something like `var MandrilMailer = use('Chromabits/Mailer/MandrillMailer')`.
-	- [ ] Introduce a new `namespace` key to `package.json` which would be parsed by the Enclosure loader in order to figure out namespace to filesystem mappings.
+	- [ ] Introduce a new `autoload` key to `package.json` which would be parsed by the Enclosure loader in order to figure out namespace to filesystem mappings.
+	- [ ] Add a mapper capable of exploring libaries in `node_modules` and discover namespaces provided by each library
+	- [ ] Cache class maps (a lot like composer dump-autoload)
 
 ### Current status
 

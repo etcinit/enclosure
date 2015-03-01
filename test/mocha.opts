@@ -1,3 +1,4 @@
 --require test/bootstrap
+--recursive
 --slow 20
 --growl
