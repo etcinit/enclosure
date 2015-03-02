@@ -22,7 +22,50 @@ Additionally, Enclosure provides other utility components such as an extended co
 
 ### What it actually ends up looking like:
 
+After setting up the container and module loader, writing applications with Enclosure ends up looking something like this (using EcmaScript 6):
+
 ```js
+// With Enclosure it is possible to stop using `require` in certain
+// parts of your application and just reference you classes by their
+// absolute namespace
+let ResponseFactory = use('MyBlog/Http/ResponseFactory'),
+    Controller = use('MyBlog/Http/BaseController');
+
+/**
+ * Class IndexController
+ *
+ * Handles main app routes
+ */
+class IndexController extends Controller
+{
+    /**
+     * Construct an instance of a IndexController
+     *
+     * @param {LanguageService} MyBlog_Support_LanguageService
+     */
+    constructor (MyBlog_Support_LanguageService)
+    {
+        // When the container resolves the controller class, it will
+        // automatically provide dependencies through the constructor.
+        // Due to language restrictions, MyBlog_Support_LanguageService 
+        // is used as an alias for MyBlog/Support/LanguageService
+        this.lang = MyBlog_Support_LanguageService;
+    }
+    
+    /**
+     * GET /api/v1/
+     * 
+     * @return {Response}
+     */
+    getHome ()
+    {
+        let welcomeMessage = this.lang.get('index.welcome', 'en-us');
+        
+        return ResponseFactory.make({
+            message: welcomeMessage;
+        });
+    }
+}
 ```
 
 ## Roadmap
@@ -30,18 +73,18 @@ Additionally, Enclosure provides other utility components such as an extended co
 This library is still a work in progress. The main goal is to build some basic tools which should allow building complex service-based/class-based applications in JavaScript easy. Many of these concepts are borrowed from PHP/Laravel/Symfony development. Some of the planned features are:
 
 - A complete service/IOC container
-	- [X] Singleton services
-	- [X] Shared services (cached services)
-	- [X] Factory functions
-	- [X] Service providers
-	- [ ] Deferred services providers
-	- [ ] Load providers defined in `package.json`
+    - [X] Singleton services
+    - [X] Shared services (cached services)
+    - [X] Factory functions
+    - [X] Service providers
+    - [ ] Deferred services providers
+    - [ ] Load providers defined in `package.json`
 - An alternative to Node's `require` function
-	- [X] Abstract the process of requiring modules from the filesystem
-	- [X] Introduce something loosely similar to namespaces from other languages. Namespaces would be defined based on the file path in the project: `src/Chromabits/Mailer/MandrillMailer.js` should be accessible by doing something like `var MandrilMailer = use('Chromabits/Mailer/MandrillMailer')`.
-	- [ ] Introduce a new `autoload` key to `package.json` which would be parsed by the Enclosure loader in order to figure out namespace to filesystem mappings.
-	- [ ] Add a mapper capable of exploring libaries in `node_modules` and discover namespaces provided by each library
-	- [ ] Cache class maps (a lot like composer dump-autoload)
+    - [X] Abstract the process of requiring modules from the filesystem
+    - [X] Introduce something loosely similar to namespaces from other languages. Namespaces would be defined based on the file path in the project: `src/Chromabits/Mailer/MandrillMailer.js` should be accessible by doing something like `var MandrilMailer = use('Chromabits/Mailer/MandrillMailer')`.
+    - [ ] Introduce a new `autoload` key to `package.json` which would be parsed by the Enclosure loader in order to figure out namespace to filesystem mappings.
+    - [ ] Add a mapper capable of exploring libaries in `node_modules` and discover namespaces provided by each library
+    - [ ] Cache class maps (a lot like composer dump-autoload)
 
 ### Current status
 
@@ -95,16 +138,16 @@ Example `package.json`:
 
 ```js
 {
-	// ...
-	"entrypoint": "MyBlog/Console/App",
-	"providers": [
-		"MyBlog/Http/Providers/RouterServiceProvider",
-		"MyBlog/Mail/MailServiceProvider"
-	],
-	"autoload": {
-		"roots": ["src"]
-	}
-	// ...
+    // ...
+    "entrypoint": "MyBlog/Console/App",
+    "providers": [
+        "MyBlog/Http/Providers/RouterServiceProvider",
+        "MyBlog/Mail/MailServiceProvider"
+    ],
+    "autoload": {
+        "roots": ["src"]
+    }
+    // ...
 }
 ```
 
@@ -115,28 +158,28 @@ The boot function can also take additional options:
 ```js
 // You are not required to use package.json
 require('enclosure').boot({
-	metadata: '/path/to/metadata.json'
+    metadata: '/path/to/metadata.json'
 });
 
 // You can also just provide the metadata directly
 require('enclosure').boot({
-	metadata: {
-		"entrypoint": "MyBlog/Console/App",
-		"providers": [
-			"MyBlog/Http/Providers/RouterServiceProvider",
-			"MyBlog/Mail/MailServiceProvider"
-		],
-		"autoload": {
-			"roots": ["src"]
-		}
-	}
+    metadata: {
+        "entrypoint": "MyBlog/Console/App",
+        "providers": [
+            "MyBlog/Http/Providers/RouterServiceProvider",
+            "MyBlog/Mail/MailServiceProvider"
+        ],
+        "autoload": {
+            "roots": ["src"]
+        }
+    }
 });
 
 // You can also specify where to install the container
 // See the section on the Container component for a description
 // of what this actually means
 require('enclosure').boot({
-	installTo: someObject
+    installTo: someObject
 });
 ```
 
@@ -150,17 +193,17 @@ While it is not enforced in any way, most examples will assume the following pro
 
 ```
 src/
-	Example/
-		App.js
-		Controllers/
-			IndexController.js
-			...
-		Providers
-			RandomServiceProvider.js
-			...
-		...
+    Example/
+        App.js
+        Controllers/
+            IndexController.js
+            ...
+        Providers
+            RandomServiceProvider.js
+            ...
+        ...
 test/
-	...
+    ...
 index.js
 package.json
 ```
@@ -172,7 +215,7 @@ The matching metadata configuration is:
 "entrypoint": "Example/App",
 "providers": ["Example/Providers/RandomServiceProvider"],
 "autoload": {
-	"roots": ["src"]
+    "roots": ["src"]
 }
 //...
 ```
@@ -186,14 +229,14 @@ Example `App.js`:
 ```js
 // Dependency injection
 var App = function (ServiceOne, ServiceTwo) {
-	this.serviceOne = ServiceOne;
-	this.serviceTwo = ServiceTwo;
+    this.serviceOne = ServiceOne;
+    this.serviceTwo = ServiceTwo;
 };
 
 // Command line arguments are passed in for convenience
 App.prototype.main = function (args) {
-	// This is where you would start setting up your app,
-	// launch servers, etc
+    // This is where you would start setting up your app,
+    // launch servers, etc
 };
 
 module.exports = App;
@@ -240,7 +283,7 @@ Once bootstrapped, the next step is to create a container for your application a
 require('enclosure').prelude();
 
 var Container = use('Chromabits/Container/Container'),
-	Wrap = use('Chromabits/Container/Wrap');
+    Wrap = use('Chromabits/Container/Wrap');
 
 var app = new Container();
 ```
@@ -281,8 +324,8 @@ Defining a service using constructor dependency injection:
 // at the constructor's parameters and try to resolve
 // services with matching names
 var ServiceTwo = function (ServiceOne) {
-	// Keep references to service instances
-	this.one = ServiceOne;
+    // Keep references to service instances
+    this.one = ServiceOne;
 };
 
 container.bind('ServiceTwo', ServiceTwo);
@@ -294,10 +337,10 @@ If you would like to access the container directly within a service declare `Enc
 
 ```js
 var ServiceThree = function (EnclosureContainer) {
-	this.app = EnclosureContainer;
-	
-	// Then you can call the container from within your class
-	// ex: var someService = this.app.make('SomeService');
+    this.app = EnclosureContainer;
+    
+    // Then you can call the container from within your class
+    // ex: var someService = this.app.make('SomeService');
 };
 
 container.bind('ServiceThree', ServiceThree);
@@ -317,13 +360,13 @@ Factory functions allow you to tell the container how to build a service for you
 
 ```js
 container.factory('ServiceFour', function (container) {
-	var instanceOne = container.make('ServiceOne');
-	
-	// In this example ServiceFour requires a configuration object
-	// as the first parameter of the constructor, so constructor DI does
-	// not work. The factory function allows us to tell the container
-	// how to build this service
-	return new ServiceFour({ sayHello: true }, instanceOne);
+    var instanceOne = container.make('ServiceOne');
+    
+    // In this example ServiceFour requires a configuration object
+    // as the first parameter of the constructor, so constructor DI does
+    // not work. The factory function allows us to tell the container
+    // how to build this service
+    return new ServiceFour({ sayHello: true }, instanceOne);
 });
 ```
 
@@ -339,10 +382,10 @@ Defining a "wrapped service":
 var myServiceWrap = new Wrap(
     ['DependencyOne', 'DependencyTwo'], 
     function (container, DependencyOne, DependencyTwo) {
-	    // When this function is called, dependencies will be passed
-	    // as arguments. In this case, we just pass them along to the
-	    // constructor of our service so that we can use them inside it
-	    return new ServiceOne(DependencyOne, DependencyTwo, 'some config string');
+        // When this function is called, dependencies will be passed
+        // as arguments. In this case, we just pass them along to the
+        // constructor of our service so that we can use them inside it
+        return new ServiceOne(DependencyOne, DependencyTwo, 'some config string');
 });
 
 container.bind('ServiceOne', myServiceWrap);
@@ -415,18 +458,18 @@ HelloServiceProvider.prototype = new ServiceProvider();
 
 // Here is where we register all services provided in this provider:
 HelloServiceProvider.prototype.register = function (app) {
-	app.bind('HelloWorld', function () {
-		return 'Hello World';
-	});
+    app.bind('HelloWorld', function () {
+        return 'Hello World';
+    });
 };
 
 // Here we boot the services provided:
 HelloServiceProvider.prototype.boot = function (app) {
-	var hello = app.make('HelloWorld');
-	
-	// In this simple case we just call a simple function, but
-	// you get the idea
-	console.log(hello());
+    var hello = app.make('HelloWorld');
+    
+    // In this simple case we just call a simple function, but
+    // you get the idea
+    console.log(hello());
 };
 
 module.exports = HelloServiceProvider;
@@ -444,17 +487,17 @@ var ServiceProvider = use('Chromabits/Container/ServiceProvider');
 class HelloServiceProvider extends ServiceProvider
 {
     register (app) {
-	     app.bind('HelloWorld', function () {
+         app.bind('HelloWorld', function () {
             return 'Hello World';
         });
     }
     
     boot (app) {
         var hello = app.make('HelloWorld');
-	
-	    // In this simple case we just call a simple function, but
-	    // you get the idea
-	    console.log(hello());
+    
+        // In this simple case we just call a simple function, but
+        // you get the idea
+        console.log(hello());
     }
 }
 
@@ -613,7 +656,7 @@ var Hello = function (World) {
 };
 
 Hello.prototype.say = function () {
-	return this.text;
+    return this.text;
 };
 
 module.export = Hello;
@@ -625,7 +668,7 @@ __src/World.js:__
 var World = function () {};
 
 World.prototype.say = function () {
-	return 'world';
+    return 'world';
 };
 
 module.exports = World;
