@@ -88,7 +88,7 @@ This library is still a work in progress. Specific features are being tracked on
 
 ### Near-term improvements:
 
-- [] Better test coverage (>80%)
+- [ ] Better test coverage (>80%)
 - [X] `package.json` extensions
 - [X] Better bootstrap experience
 
