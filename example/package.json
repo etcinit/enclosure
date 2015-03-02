@@ -1,0 +1,27 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "An example application using Enclosure",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "enclosure",
+    "example"
+  ],
+  "author": "Eduardo Trujillo <ed@chromabits.com>",
+  "license": "MIT",
+  "entrypoint": "Example/Console/App",
+  "providers": [
+    "Example/Providers/ExampleProvider"
+  ],
+  "autoload": {
+    "roots": [
+      "src"
+    ]
+  },
+  "dependencies": {
+    "app-root-path": "^1.0.0"
+  }
+}

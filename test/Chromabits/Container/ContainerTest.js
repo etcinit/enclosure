@@ -1,8 +1,8 @@
 "use strict";
 
-var Container = require('../src/Container'),
+var Container = require('../../../src/Chromabits/Container/Container'),
 
-    Wrap = require('../src/Wrap');
+    Wrap = require('../../../src/Chromabits/Container/Wrap');
 
 /**
  * Simple hello world service
@@ -45,7 +45,7 @@ ServiceThree.prototype.gotDependencies = function () {
     return this.one instanceof ServiceOne && this.two instanceof ServiceTwo;
 };
 
-describe('Container', function () {
+describe('Chromabits/Container/Container', function () {
     it('should be a constructor', function() {
         var instance = new Container();
 
