@@ -20,6 +20,11 @@ The Loader requires you to structure your project in a very specific way (inspir
 
 Additionally, Enclosure provides other utility components such as an extended container with support for Service Providers. 
 
+### What it actually ends up looking like:
+
+```js
+```
+
 ## Roadmap
 
 This library is still a work in progress. The main goal is to build some basic tools which should allow building complex service-based/class-based applications in JavaScript easy. Many of these concepts are borrowed from PHP/Laravel/Symfony development. Some of the planned features are:
@@ -77,14 +82,150 @@ Additionally, when installing Enclosure to the global scope, the following varia
 
 ### First steps
 
-After installation, the first thing you'll probably want to do is use one of Enclosure's classes. On previous versions, these were inside the enclosure object itself (`enclosure.Container`). However, since newer versions include more classes, this method was dropped since it requires every file in enclosure when it is required.
+If you are developing an application with Enclosure (not a library), a good place to start to use the Bootstrapper class. This class can automatically setup Enclosure for you. All you need to do is add some extra information to your `package.json` and call the library. 
 
-Instead, Enclosure makes use of it's own Loader component (the `use()` function) for getting classes. The initial bootstrap environment is only capable of resolving classes that are inside the library. 
+Example `index.js`:
+
+```js
+// This creates, setups and runs an application container
+require('enclosure').boot();
+```
+
+Example `package.json`:
+
+```js
+{
+	// ...
+	"entrypoint": "MyBlog/Console/App",
+	"providers": [
+		"MyBlog/Http/Providers/RouterServiceProvider",
+		"MyBlog/Mail/MailServiceProvider"
+	],
+	"autoload": {
+		"roots": ["src"]
+	}
+	// ...
+}
+```
+
+Each of these keys will be explained more in detail in the sections below. However, note that **none of these are required** for `boot()` to work properly, altohugh you will probably want to use them to include your own classes.
+
+The boot function can also take additional options:
+
+```js
+// You are not required to use package.json
+require('enclosure').boot({
+	metadata: '/path/to/metadata.json'
+});
+
+// You can also just provide the metadata directly
+require('enclosure').boot({
+	metadata: {
+		"entrypoint": "MyBlog/Console/App",
+		"providers": [
+			"MyBlog/Http/Providers/RouterServiceProvider",
+			"MyBlog/Mail/MailServiceProvider"
+		],
+		"autoload": {
+			"roots": ["src"]
+		}
+	}
+});
+
+// You can also specify where to install the container
+// See the section on the Container component for a description
+// of what this actually means
+require('enclosure').boot({
+	installTo: someObject
+});
+```
+
+#### Global variables
+
+After running the bootstrapper, the container should be available under `container` global variable. The loader can bu used through the `use()` global variables. Unless you provided a different install context through the `installTo` config option.
+
+#### Project Structure
+
+While it is not enforced in any way, most examples will assume the following project structure:
+
+```
+src/
+	Example/
+		App.js
+		Controllers/
+			IndexController.js
+			...
+		Providers
+			RandomServiceProvider.js
+			...
+		...
+test/
+	...
+index.js
+package.json
+```
+
+The matching metadata configuration is:
+
+```js
+//...
+"entrypoint": "Example/App",
+"providers": ["Example/Providers/RandomServiceProvider"],
+"autoload": {
+	"roots": ["src"]
+}
+//...
+```
+
+#### The Entrypoint
+
+So you have probably noticed the `entrypoint` configuration key. This tells the bootstrapper where to go next once your application has been booted. The entrypoint is treated as any other service and will have it dependencies resolved during instantiation.
+
+Example `App.js`:
+
+```js
+// Dependency injection
+var App = function (ServiceOne, ServiceTwo) {
+	this.serviceOne = ServiceOne;
+	this.serviceTwo = ServiceTwo;
+};
+
+// Command line arguments are passed in for convenience
+App.prototype.main = function (args) {
+	// This is where you would start setting up your app,
+	// launch servers, etc
+};
+
+module.exports = App;
+```
+
+`main(args)` gets called once `enclosure.boot()` has finsished setting up the environment.
+
+#### Seeing is better than reading (sometimes):
+
+Check out the example project for a near comprehensive use of all the features in Enclosure. The project is located under the `example/` directory. Please note that this project is written in EcmaScript 6 (ES6).
+
+### Prelude Environment
+
+If you want more control on how Enclosure is setup, you can use the Prelude environment. You will have to manually setup the Container and Loader components.
+
+After installation, the first thing you'll probably want to do is use one of Enclosure's classes. On previous versions, these were inside the enclosure object itself (`enclosure.Container`). However, since newer versions include more classes, this method was dropped since it requires every file in enclosure when it is required, which can be slow.
+
+Instead, Enclosure makes use of it's own Loader component (the `use()` function) for getting classes. The initial prelude environment is only capable of resolving classes that are inside the library. 
 
 To initialize the bootstrap environment, just call the following function before any call to `use()`:
 
 ```js
-require('enclosure').bootstrap();
+require('enclosure').prelude();
+
+// Now you can use Enclosure's classes by using use()
+var Container = use('Chromabits/Container/Container');
+var instance = new Container();
+
+// You can also specify where to install the environment to if you 
+// prefer to keep the global context clean
+require('enclosure').preludeTo(someObject);
+var Container = someObject.use(...);
 ```
 
 See _The Loader Component_ below for more instructions on how to setup the Loader to load your own classes and how to use the `use()` function.
@@ -96,7 +237,7 @@ See _The Loader Component_ below for more instructions on how to setup the Loade
 Once bootstrapped, the next step is to create a container for your application and register services into it. You should install the container instance into the global variable (more on that below) or pass it along to your application components so that they can resolve dependencies from it.
 
 ```js
-require('enclosure').bootstrap();
+require('enclosure').prelude();
 
 var Container = use('Chromabits/Container/Container'),
 	Wrap = use('Chromabits/Container/Wrap');
@@ -232,7 +373,7 @@ Note: The loader component is explained in the section below.
 __src/app.js:__
 
 ```js
-require('enclosure').bootstrap();
+require('enclosure').prelude();
 
 var Application = use('Chromabits/Container/Application'),
     Loader = use('Chromabits/Loader/Loader'),
@@ -395,7 +536,7 @@ The generated map in this case will contain the following files:
 The last piece of the puzzle is Loaders. Loaders are just classes that group a bunch of class maps together and are able to tell if they can resolve a certain class:
 
 ```js
-require('enclosure').bootstrap();
+require('enclosure').prelude();
 
 var Container = use('Chromabits/Container/Container'),
     Loader = use('Chromabits/Loader/Loader'),
@@ -436,7 +577,7 @@ Below is a full example of the previous components:
 __src/app.js:__
 
 ```js
-require('enclosure').bootstrap();
+require('enclosure').prelude();
 
 var Container = use('Chromabits/Container/Container'),
     Loader = use('Chromabits/Loader/Loader'),
