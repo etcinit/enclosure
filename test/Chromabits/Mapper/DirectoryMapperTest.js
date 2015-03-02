@@ -1,15 +1,16 @@
 'use strict';
 
-var path = require('path');
+let root = '../../../src/',
+    path = require('path');
 
-var AbstractMapper = require('../../src/Chromabits/Mapper/AbstractMapper'),
-    DirectoryMapper = require('../../src/Chromabits/Mapper/DirectoryMapper'),
-    ClassMap = require('../../src/Chromabits/Mapper/ClassMap');
+var AbstractMapper = require(root + 'Chromabits/Mapper/AbstractMapper.js'),
+    DirectoryMapper = require(root + 'Chromabits/Mapper/DirectoryMapper.js'),
+    ClassMap = require(root + 'Chromabits/Mapper/ClassMap.js');
 
-describe('DirectoryMapper', function () {
+describe('Chromabits/Mapper/DirectoryMapper', function () {
     it('should be a constructor', function () {
       var instance = new DirectoryMapper(
-          path.resolve(__dirname, '../../example')
+          path.resolve(__dirname, root, '../example')
       );
 
       instance.should.be.instanceOf(DirectoryMapper);
@@ -19,7 +20,7 @@ describe('DirectoryMapper', function () {
     describe('#generate', function () {
         it('should generate a class map', function () {
             var instance = new DirectoryMapper(
-                path.resolve(__dirname, '../../example')
+                path.resolve(__dirname, root, '../example')
             );
 
             instance.generate().should.be.instanceOf(ClassMap);
@@ -29,12 +30,12 @@ describe('DirectoryMapper', function () {
     describe('#generateClassPath', function () {
         it('should generate a class path string', function () {
             var instance = new DirectoryMapper(
-                path.resolve(__dirname, '../../example')
+                path.resolve(__dirname, root, '../example')
             );
 
             instance.generateClassPath(
-                path.resolve(__dirname, '../../example'),
-                path.resolve(__dirname, '../../example/Class.js')
+                path.resolve(__dirname, root, '../example'),
+                path.resolve(__dirname, root, '../example/Class.js')
             ).should.be.equal('/Class');
         });
     });

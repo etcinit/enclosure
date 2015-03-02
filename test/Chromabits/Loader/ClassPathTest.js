@@ -1,8 +1,8 @@
 "use strict";
 
-var ClassPath = require('../../src/Chromabits/Loader/ClassPath');
+var ClassPath = require('../../../src/Chromabits/Loader/ClassPath');
 
-describe('ClassPath', function () {
+describe('Chromabits/Loader/ClassPath', function () {
     it('should be a constructor', function () {
         var instance = new ClassPath('Chromabits/Testing/MyClass');
 

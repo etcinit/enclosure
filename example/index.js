@@ -13,4 +13,6 @@ require('babel/register');
 // Normally, we would use require('enclosure').boot(). However, since this
 // project is inside the Enclosure repo itself, it is more convenient to load
 // the library directly.
-require('../src/index').boot();
+require('../src/index').boot({
+    metadata: __dirname + '/package.json'
+});

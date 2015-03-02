@@ -26,3 +26,5 @@ class HelloWorld
         this.logger.log('Hello World');
     }
 }
+
+module.exports = HelloWorld;

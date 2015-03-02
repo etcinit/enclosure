@@ -89,7 +89,7 @@ class DirectoryMapper extends AbstractMapper
     {
         return ArrayUtils.forEachUntil(extensions, (extension) => {
             // Skip this extension if the actual path is shorter
-            if (filePath.length > extension.length) {
+            if (filePath.length < extension.length) {
                 return;
             }
 

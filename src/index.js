@@ -3,7 +3,7 @@
 let Container = require('./Chromabits/Container/Container'),
     Wrap = require('./Chromabits/Container/Wrap'),
     Loader = require('./Chromabits/Loader/Loader.js'),
-    EnclosureClassMap = require('./Chromabits/Mapper/EnclosureClassMap.js');
+    Bootstrapper = require('./Chromabits/Bootstrapper/Bootstrapper.js');
 
 module.exports = {
     // Keep backwards compatibility
@@ -18,8 +18,8 @@ module.exports = {
      *
      * @returns {*}
      */
-    prelude: function () {
-        return this.bootstrapTo(global);
+    prelude () {
+        return this.preludeTo(global);
     },
 
     /**
@@ -30,12 +30,22 @@ module.exports = {
      *
      * @returns {*}
      */
-    preludeTo: function (target) {
-        var loader = new Loader();
+    preludeTo (target)
+    {
+        Bootstrapper.setupPrelude(target);
+    },
 
-        loader.addMap(EnclosureClassMap);
-        target.use = loader.get.bind(loader);
+    /**
+     * Use the bootstrapper
+     *
+     * @param options
+     *
+     * @returns {Application}
+     */
+    boot (options)
+    {
+        let bootstrapper = new Bootstrapper(options);
 
-        return this;
+        return bootstrapper.boot();
     }
 };

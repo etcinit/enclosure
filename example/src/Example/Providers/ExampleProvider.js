@@ -18,10 +18,12 @@ class ExampleProvider extends ServiceProvider
     register (app)
     {
         // Register the HelloWorld service
-        app.bind('HelloWorld', function (app) {
+        app.factory('HelloWorld', function () {
             let logger = app.make('Example/Support/Logger');
 
             return new HelloWorld(logger);
         });
     }
 }
+
+module.exports = ExampleProvider;

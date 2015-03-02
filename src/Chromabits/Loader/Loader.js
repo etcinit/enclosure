@@ -30,9 +30,9 @@ class Loader
      */
     addMap (classMap)
     {
-        ensure(map, ClassMap);
+        ensure(classMap, ClassMap);
 
-        this.maps.push(map);
+        this.maps.push(classMap);
     }
 
     /**

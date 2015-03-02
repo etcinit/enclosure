@@ -17,3 +17,5 @@ class Logger
         console.log(message);
     }
 }
+
+module.exports = Logger;

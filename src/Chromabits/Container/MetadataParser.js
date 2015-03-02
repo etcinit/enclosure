@@ -1,6 +1,7 @@
 'use strict';
 
 let fs = require('fs'),
+    path = require('path'),
     ensure = require('ensure.js');
 
 /**
@@ -19,6 +20,11 @@ class MetadataParser
     {
         if (ensure.isString(filename)) {
             this.data = JSON.parse(fs.readFileSync(filename, 'utf8'));
+
+            // Set the base path to be the location of the package.json
+            if (this.data.autoload) {
+                this.data.autoload.path = path.dirname(filename);
+            }
         } else {
             this.data = filename;
 

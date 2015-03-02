@@ -33,7 +33,7 @@ class ArrayUtils
         }
 
         // If there is a default value, return that instead of nothing
-        if (def) {
+        if (def !== undefined) {
             return def;
         }
     }

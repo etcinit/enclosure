@@ -15,6 +15,7 @@
   "author": "Eduardo Trujillo <ed@chromabits.com> (http://chromabits.com/)",
   "license": "MIT",
   "dependencies": {
+    "app-root-path": "^1.0.0",
     "ensure.js": "^0.5.3",
     "introspect": "0.0.3",
     "ramda": "^0.10.0",
