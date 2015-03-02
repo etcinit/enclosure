@@ -14,11 +14,11 @@ The IoC container acts as a centralized repository of service singletons and fac
 While you could implement similar functionality by defining all services in a global object, the IoC container has the added benefit that it can perform Dependency Injection and it can resolve aliases. Dependency Injection is very useful for testing since it allows you to quickly replace a component of your application with a mock or stub for testing, without having to change the code that uses it at all.
 
 The second half of Enclosure consists of a module loading system. This sounds redundant since Node.js already includes `require`. However, as
-applications grow more complicated and the number .js files in your source folder keeps growing, requiring files from each other creates a very spaghetti like situation which makes it really hard to refactor code.
+applications grow more complicated and the number .js files in your source folder keeps growing, requiring files from each other creates a very spaghetti-like situation which makes it really hard to refactor code.
 
-The Loader requires you to structure your project in a very specific way (inspired by PHP's PSR standards), but once it is setup, it allows you include files using an absolute path format rather than using relative paths. This allows you to quickly move files around in your project without having to worry too much about broken requires.
+The Loader requires you to structure your project in a very specific way (inspired by PHP's PSR standards), but once it is setup, it allows you include files using an absolute path format rather than using relative paths. This allows you to quickly move files around in your project without having to worry too much about broken `require()`s.
 
-Additionally, Enclosure provides other utility components such as an extended container with support for Service Providers. 
+Additionally, Enclosure provides other utility components such as an extended container with support for Service Providers and automated Bootstrapper. 
 
 ### What it actually ends up looking like:
 
@@ -70,34 +70,34 @@ class IndexController extends Controller
 
 ## Roadmap
 
-This library is still a work in progress. The main goal is to build some basic tools which should allow building complex service-based/class-based applications in JavaScript easy. Many of these concepts are borrowed from PHP/Laravel/Symfony development. Some of the planned features are:
+This library is still a work in progress. Specific features are being tracked on GitHub issues. Main project features are listed below:
 
-- A complete service/IOC container
+- **The Container Component:** A complete service/IOC container
     - [X] Singleton services
     - [X] Shared services (cached services)
     - [X] Factory functions
     - [X] Service providers
-    - [ ] Deferred services providers
-    - [ ] Load providers defined in `package.json`
-- An alternative to Node's `require` function
-    - [X] Abstract the process of requiring modules from the filesystem
+    - [ ] Deferred service providers
+    - [X] Load providers defined in `package.json`
+- **The Loader Component:** An alternative to Node's `require` function
+    - [X] Abstract the process of requiring modules from the filesystem (`use()`)
     - [X] Introduce something loosely similar to namespaces from other languages. Namespaces would be defined based on the file path in the project: `src/Chromabits/Mailer/MandrillMailer.js` should be accessible by doing something like `var MandrilMailer = use('Chromabits/Mailer/MandrillMailer')`.
-    - [ ] Introduce a new `autoload` key to `package.json` which would be parsed by the Enclosure loader in order to figure out namespace to filesystem mappings.
-    - [ ] Add a mapper capable of exploring libaries in `node_modules` and discover namespaces provided by each library
-    - [ ] Cache class maps (a lot like composer dump-autoload)
+    - [X] Introduce a new `autoload` key to `package.json` which would be parsed by the Enclosure loader in order to figure out namespace to filesystem mappings.
+    - [ ] Add a mapper capable of exploring libraries in `node_modules` and discover namespaces provided by each library
+    - [ ] Cache class maps (a lot like PHP Composer's dump-autoload)
+
+### Near-term improvements:
+
+- [] Better test coverage (>80%)
+- [X] `package.json` extensions
+- [X] Better bootstrap experience
 
 ### Current status
 
-There is a basic implementation of the Container and Wrap classes (Wraps are explained below). 
-The container should allow defining singletons, services built by factory functions, and "Wrapped" services.
-It will also detect circular dependencies. 
-
-The Application class, which is extension of the Container class, is capable of loading service providers,
-registering them and booting them.
-
-The loader system is sort of working but requires more extensive testing. 
-
-TODO: Testing, defining things in package.json, better bootstrap experience
+- **Bootstrapper Component:** The bootstrapper component is capable of setting up a container, an application, service providers, and a loader with a single method call.
+- **Container Component:** There is an almost complete implementation of the IoC container. Services can be defined through a binding, a factory. Services can also be singletons, or stored as singletons once they are resolved (Shared services). Services can define dependencies through their constructors or a Wrap. Circular dependencies can be detected. The container can also fallback to the loader if a service cannot be resolved, and even apply dependency injection to this method.
+- **Application Component:** Is an extension of the Container, and is able to register and boot Service Providers, which can be referenced just by their class name thanks to the Loader component.
+- **Loader Component:** Is capable of resolving class constructors and modules from a full namespace path (`Name/Space/Class`). Currently the two possible class map generators can generate class maps for directories and for Enclosure itself. The component is flexible enough for future mappers to be added in the future.
 
 ## Usage
 
@@ -151,7 +151,7 @@ Example `package.json`:
 }
 ```
 
-Each of these keys will be explained more in detail in the sections below. However, note that **none of these are required** for `boot()` to work properly, altohugh you will probably want to use them to include your own classes.
+Each of these keys will be explained more in detail in the sections below. However, note that **none of these are required** for `boot()` to work properly, although you will probably want to use them to include your own classes.
 
 The boot function can also take additional options:
 
@@ -185,7 +185,7 @@ require('enclosure').boot({
 
 #### Global variables
 
-After running the bootstrapper, the container should be available under `container` global variable. The loader can bu used through the `use()` global variables. Unless you provided a different install context through the `installTo` config option.
+After running the bootstrapper, the container should be available under `container` global variable. The loader can be used through the `use()` global variables. Unless you provided a different install context through the `installTo` config option.
 
 #### Project Structure
 
@@ -242,7 +242,7 @@ App.prototype.main = function (args) {
 module.exports = App;
 ```
 
-`main(args)` gets called once `enclosure.boot()` has finsished setting up the environment.
+`main(args)` gets called once `enclosure.boot()` has finished setting up the environment.
 
 #### Seeing is better than reading (sometimes):
 
@@ -320,7 +320,7 @@ Enclosure does not install itself automatically to the global context since ther
 Defining a service using constructor dependency injection:
 
 ```js
-// Enclosure's Container will use instrospection to look
+// Enclosure's Container will use introspection to look
 // at the constructor's parameters and try to resolve
 // services with matching names
 var ServiceTwo = function (ServiceOne) {
@@ -395,7 +395,7 @@ container.bind('ServiceOne', myServiceWrap);
 
 Shared services are services that become singletons once they are built. This means that if the service is never requested it will never be instantiated. However, if it is, the instance will be cached and returned on every subsequent `make` call. 
 
-Shared services can be defined by providing a thrid parameter to `container.bind` and `container.factory`:
+Shared services can be defined by providing a third parameter to `container.bind` and `container.factory`:
 
 ```js
 container.bind('ServiceOne', myServiceWrap, true);
@@ -477,7 +477,7 @@ module.exports = HelloServiceProvider;
 
 #### Example in ES6:
 
-The previous example can be rewritten in EcmaScript 6 for a much more simple syntax:
+The previous example can be rewritten in EcmaScript 6 for a much simpler syntax:
 
 __src/Providers/HelloServiceProvider.js:__
 
@@ -516,7 +516,7 @@ In most cases, you'll probably won't have to deal with ClassMaps directly, but i
 
 #### Class names
 
-The class name convention for Enclosure is borrowed from PHP namespaces, with foward-slashes instead of back-slashes as path separators.
+The class name convention for Enclosure is borrowed from PHP namespaces, with foward slashes instead of back-slashes as path separators.
 
 _Valid:_
 
@@ -538,7 +538,7 @@ A class map with all Enclosure classes is available as `Chromabits/Mapper/Enclos
 
 ### Mappers
 
-The first step twords automatic class loading is to use a Mapper. In Enclosure, a Mapper is basically just a factory capable of creating a class map. If you would like to create your own, just extend the `AbstractMapper` class. However, most people will probably just want ot use the `DirectoryMapper` which generates a class map by looking at a directory structure.
+The first step towards automatic class loading is to use a Mapper. In Enclosure, a Mapper is basically just a factory capable of creating a class map. If you would like to create your own, just extend the `AbstractMapper` class. However, most people will probably just want to use the `DirectoryMapper` which generates a class map by looking at a directory structure.
 
 #### DirectoryMapper
 
@@ -716,7 +716,7 @@ Please note that this function does not construct an instance. It actually retur
 
 ### Automatic construction
 
-As shown in the complete example above, the Container is capable of using a Loader to try to resolve services that are not explicitly binded. Dependency Injection is also performed during this process. So you can use classes with dependencies as services without having to register them. 
+As shown in the complete example above, the Container is capable of using a Loader to try to resolve services that are not explicitly bound. Dependency Injection is also performed during this process. So you can use classes with dependencies as services without having to register them. 
 
 Continuing the previous example:
 
