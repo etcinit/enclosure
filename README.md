@@ -5,6 +5,29 @@ A Javascript IOC container and module loading system
 
 ---
 
+## Introduction
+
+Before you begin, take note that Enclosure is a VERY opinionated way of writing 
+Javascript code. It really asks you to write code in a very specific way, and 
+yes, the code written on it looks a lot like PHP and Java (There is a reason
+for it), and just plain weird.
+
+### Things that you will probably like:
+
+- Complex and automated dependency injection
+- Automated file loading and construction of classes
+- No more relative paths on your Node.js code!
+- Support for ES6
+- Everything in classes!
+
+### Things that you will probably won't like:
+
+- Everything in classes!
+- It looks like PHP/Java (yes, there's even an entrypoint class with `main()`)
+- It doesn't fit in well with other libraries (yet)
+- It doesn't port to the web browser (yet)
+- You have to write your project around it
+
 ## About
 
 Enclosure is a library that aims to make developing complex Node.js applications easier. It provides a simple foundation for getting an Inversion of Control container and Module Loading system in your application.
