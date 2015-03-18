@@ -47,5 +47,19 @@ module.exports = {
         let bootstrapper = new Bootstrapper(options);
 
         return bootstrapper.boot();
+    },
+
+    /**
+     * Use the bootstrapper but do not run the entry point
+     *
+     * @param options
+     *
+     * @returns {Application}
+     */
+    softBoot (options)
+    {
+        let bootstrapper = new Bootstrapper(options);
+
+        return bootstrapper.softBoot();
     }
 };

@@ -53,6 +53,24 @@ class Bootstrapper
     }
 
     /**
+     * Setup an Enclosure application
+     *
+     * This works just like boot() but it does not start the application
+     * through the entry point. This is useful for unit testing since you most
+     * likely do not want the main application server running, etc
+     *
+     * @returns {Application}
+     */
+    softBoot ()
+    {
+        this.bootAutoloader();
+        this.bootContainer();
+        this.bootApplication();
+
+        return this.container;
+    }
+
+    /**
      * Setup an autoloader
      */
     bootAutoloader ()

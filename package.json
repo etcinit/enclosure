@@ -1,6 +1,6 @@
 {
   "name": "enclosure",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "IOC Container",
   "main": "lib/index.js",
   "repository": {
