@@ -1,11 +1,10 @@
 'use strict';
 
-let ensure = require('ensure.js'),
-    introspect = require('retrieve-arguments');
+import ensure from 'ensure.js';
+import { Nullable } from 'ensure.js';
+import instrospect from 'retrieve-arguments';
 
-let Wrap = require('./Wrap'),
-    Loader = require('../Loader/Loader'),
-    Nullable = ensure.Nullable;
+import Wrap from './Wrap';
 
 /**
  * Class Container
@@ -423,8 +422,6 @@ class Container
      */
     setLoader (loader)
     {
-        ensure(loader, Loader);
-
         this.loader = loader;
 
         this.instance('Chromabits/Loader/Loader', loader);
