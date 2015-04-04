@@ -2,7 +2,7 @@
 
 import ensure from 'ensure.js';
 import { Nullable } from 'ensure.js';
-import instrospect from 'retrieve-arguments';
+import introspect from 'retrieve-arguments';
 
 import Wrap from './Wrap';
 
