@@ -1,5 +1,5 @@
 ![Logo](http://i.imgur.com/qAoBgMP.png)
-# [Enclosure](http://enclosure.me) ![Build Status](https://travis-ci.org/etcinit/enclosure.svg?branch=develop)
+# [Enclosure](http://enclosure.me) ![Build Status](https://travis-ci.org/etcinit/enclosure.svg?branch=develop) [![Code Climate](https://codeclimate.com/github/etcinit/enclosure/badges/gpa.svg)](https://codeclimate.com/github/etcinit/enclosure) [![Test Coverage](https://codeclimate.com/github/etcinit/enclosure/badges/coverage.svg)](https://codeclimate.com/github/etcinit/enclosure)
 
 A Javascript IOC container and module loading system
 
@@ -7,7 +7,7 @@ A Javascript IOC container and module loading system
 
 ## Documentation
 
-Guides and documentation is available at the 
+Guides and documentation is available at the
 [official website](http://enclosure.me)
 
 ## License
