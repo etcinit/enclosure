@@ -5,7 +5,7 @@
  *
  * Thrown when a class is not found
  */
-class ClassNotFoundException
+class ClassNotFoundException extends Error
 {
     /**
      * Construct an instance of a ClassNotFoundException
@@ -13,7 +13,7 @@ class ClassNotFoundException
      * @param className
      */
     constructor (className) {
-        Error.call(this, arguments);
+        super(...arguments);
 
         this.setClassName(className);
     }

@@ -11,7 +11,7 @@
     "test": "babel-node node_modules/.bin/_mocha test/ test/**/*.js",
     "compile": "babel -d lib/ src/",
     "prepublish": "npm run compile",
-    "cover": "babel-node node_modules/.bin/isparta cover --report text --report html node_modules/.bin/_mocha -- --reporter spec"
+    "cover": "babel-node node_modules/.bin/isparta cover --report text --report lcov node_modules/.bin/_mocha -- --reporter dot"
   },
   "author": "Eduardo Trujillo <ed@chromabits.com> (http://chromabits.com/)",
   "license": "MIT",
