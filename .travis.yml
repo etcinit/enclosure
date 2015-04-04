@@ -6,4 +6,4 @@ node_js:
   - "0.10"
 before_instal:
   - "npm install -g babel-node"
-script: npm cover
+script: npm run cover
