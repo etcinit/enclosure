@@ -1,11 +1,16 @@
 ---
-settings:
-    jsx: true
-    ecmascript: 6
+parser: babel-eslint
 
 env:
-    browser: true
-    node: true
+  browser: true
+  node: true
+
+ecmaFeatures:
+    arrowFunctions
+    classes
+    modules
+    spread
+    jsx
 
 rules:
     brace-style: 2

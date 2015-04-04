@@ -5,16 +5,15 @@
  *
  * Thrown when a class is not found
  */
-class ClassNotFoundException
+class ClassNotFoundException extends Error
 {
     /**
      * Construct an instance of a ClassNotFoundException
      *
      * @param className
      */
-    constructor (className)
-    {
-        Error.call(this, arguments);
+    constructor (className) {
+        super(...arguments);
 
         this.setClassName(className);
     }
@@ -26,11 +25,10 @@ class ClassNotFoundException
      *
      * @returns {undefined} -
      */
-    setClassName (className)
-    {
+    setClassName (className) {
         this.message = 'Class `' + className + '` is not defined in the current'
         + ' context. Check your class map setup';
     }
 }
 
-module.exports = ClassNotFoundException;
+export default ClassNotFoundException;

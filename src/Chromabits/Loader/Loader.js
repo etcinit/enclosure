@@ -1,11 +1,11 @@
 'use strict';
 
-let ensure = require('ensure.js');
+import ensure from 'ensure.js';
 
-let ArrayUtils = require('../Util/ArrayUtils.js'),
-    ClassPath = require('../Loader/ClassPath.js'),
-    ClassNotFoundException = require('./Exceptions/ClassNotFoundException.js'),
-    ClassMap = require('../Mapper/ClassMap.js');
+import ArrayUtils from '../Util/ArrayUtils.js';
+import ClassPath from '../Loader/ClassPath.js';
+import ClassNotFoundException from './Exceptions/ClassNotFoundException.js';
+import ClassMap from '../Mapper/ClassMap.js';
 
 /**
  * ClassLoader
@@ -18,8 +18,7 @@ class Loader
     /**
      * Construct an instance of a Loader
      */
-    constructor ()
-    {
+    constructor () {
         this.maps = [];
     }
 
@@ -28,8 +27,7 @@ class Loader
      *
      * @param {ClassMap} classMap -
      */
-    addMap (classMap)
-    {
+    addMap (classMap) {
         ensure(classMap, ClassMap);
 
         this.maps.push(classMap);
@@ -42,8 +40,7 @@ class Loader
      *
      * @return {*} - Class constructor or module exports
      */
-    get (fullClassName)
-    {
+    get (fullClassName) {
         var path = new ClassPath(fullClassName),
             absoluteClassName = path.toAbsolute();
 
@@ -67,8 +64,7 @@ class Loader
      *
      * @returns {boolean}
      */
-    has (fullClassName)
-    {
+    has (fullClassName) {
         var path = new ClassPath(fullClassName),
             absoluteClassName = path.toAbsolute();
 
@@ -80,4 +76,4 @@ class Loader
     }
 }
 
-module.exports = Loader;
+export default Loader;

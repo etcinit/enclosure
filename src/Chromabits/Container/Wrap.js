@@ -1,8 +1,7 @@
 'use strict';
 
-let ensure = require('ensure.js');
-
-let Nullable = ensure.Nullable;
+import ensure from 'ensure.js';
+import { Nullable } from 'ensure.js';
 
 /**
  * Dependency wrapper for the Enclosure container
@@ -21,8 +20,7 @@ class Wrap
      * @param dependencies
      * @param constructor
      */
-    constructor (dependencies, constructor)
-    {
+    constructor (dependencies, constructor) {
         ensure(dependencies, Nullable(Array));
         ensure(constructor, Function);
 
@@ -37,8 +35,7 @@ class Wrap
      *
      * @returns {*|Array}
      */
-    getDependencies ()
-    {
+    getDependencies () {
         return this.dependencies;
     }
 
@@ -47,10 +44,9 @@ class Wrap
      *
      * @returns {*}
      */
-    getConstructor ()
-    {
+    getConstructor () {
         return this.constructor;
     }
 }
 
-module.exports = Wrap;
+export default Wrap;

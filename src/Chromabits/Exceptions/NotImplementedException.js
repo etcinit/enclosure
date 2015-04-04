@@ -13,8 +13,7 @@ class NotImplementedException extends Error
      *
      * @param componentName
      */
-    constructor (componentName)
-    {
+    constructor (componentName) {
         if (componentName) {
             super(`${componentName} is not implemented by this object`);
             return;
@@ -23,3 +22,5 @@ class NotImplementedException extends Error
         super('This component/method is not implemented by this object');
     }
 }
+
+export default NotImplementedException;

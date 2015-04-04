@@ -1,8 +1,8 @@
 'use strict';
 
-let path = require('path');
+import path from 'path';
 
-let DirectoryMapper = require('./DirectoryMapper');
+import DirectoryMapper from './DirectoryMapper';
 
 /**
  * EnclosureClassMap
@@ -13,4 +13,4 @@ let DirectoryMapper = require('./DirectoryMapper');
  */
 let mapper = new DirectoryMapper(path.resolve(__dirname, '../../'));
 
-module.exports = mapper.generate();
+export default mapper.generate();

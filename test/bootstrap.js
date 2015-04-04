@@ -6,4 +6,5 @@
 require('should');
 
 // Get Babel working before any tests are ran
-require("babel/register");
+// Uncomment this is you are looking to use run mocha without babel-node
+// require("babel/register");

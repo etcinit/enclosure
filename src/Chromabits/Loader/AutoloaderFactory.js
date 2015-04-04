@@ -1,10 +1,10 @@
 'use strict';
 
-let path = require('path');
+import path from 'path';
 
-let Loader = require('./Loader.js'),
-    DirectoryMapper = require('../Mapper/DirectoryMapper.js'),
-    EnclosureClassMap = require('../Mapper/EnclosureClassMap.js');
+import Loader from './Loader.js';
+import DirectoryMapper from '../Mapper/DirectoryMapper.js';
+import EnclosureClassMap from '../Mapper/EnclosureClassMap.js';
 
 /**
  * Class AutoloaderFactory
@@ -36,8 +36,7 @@ class AutoloaderFactory
      *
      * @param config
      */
-    constructor (config)
-    {
+    constructor (config) {
         this.config = config;
 
         // If nothing is specified, the Enclosure mapper will be included as
@@ -52,8 +51,7 @@ class AutoloaderFactory
      *
      * @returns {Loader}
      */
-    make ()
-    {
+    make () {
         let loader = new Loader(),
             mappers = this.makeMappers();
 
@@ -75,8 +73,7 @@ class AutoloaderFactory
      *
      * @returns {Array}
      */
-    makeMappers ()
-    {
+    makeMappers () {
         let mappers = [];
 
         // Make root mappers
@@ -95,4 +92,4 @@ class AutoloaderFactory
     }
 }
 
-module.exports = AutoloaderFactory;
+export default AutoloaderFactory;

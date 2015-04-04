@@ -1,8 +1,6 @@
 'use strict';
 
-let NotImplementedException = require(
-    '../Exceptions/NotImplementedException.js'
-);
+import NotImplementedException from '../Exceptions/NotImplementedException.js';
 
 /**
  * Class AbstractMapper
@@ -21,10 +19,9 @@ class AbstractMapper
      *
      * @returns {AbstractMapper} -
      */
-    generate ()
-    {
+    generate () {
         throw new NotImplementedException('generate()');
     }
 }
 
-module.exports = AbstractMapper;
+export default AbstractMapper;

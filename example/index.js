@@ -4,6 +4,7 @@
  * This is the starting point of an Enclosure application.
  * Here we setup anything we need before Enclosure starts doing its thing.
  */
+ var path = require('path');
 
 // We want to use ES6 so we enable Babel's transpiler which will automagically
 // transform ES6 files into ES5-level code
@@ -14,5 +15,5 @@ require('babel/register');
 // project is inside the Enclosure repo itself, it is more convenient to load
 // the library directly.
 require('../src/index').boot({
-    metadata: __dirname + '/package.json'
+    metadata: path.resolve(__dirname, '/package.json')
 });
