@@ -1,10 +1,10 @@
 'use strict';
 
-let ensure = require('ensure.js'),
-    R = require('ramda');
+import ensure from 'ensure.js';
+import R from 'ramda';
 
-let Container = require('./Container.js'),
-    ServiceProvider = require('./ServiceProvider.js');
+import Container from './Container.js';
+import ServiceProvider from './ServiceProvider.js';
 
 /**
  * Class Application
@@ -17,8 +17,7 @@ class Application extends Container
     /**
      * Construct an instance of an Application
      */
-    constructor()
-    {
+    constructor() {
         // Call parent constructor
         super();
 
@@ -31,8 +30,7 @@ class Application extends Container
      *
      * @param {String|Function|ServiceProvider} provider
      */
-    addProvider (provider)
-    {
+    addProvider (provider) {
         // If a string is provided, we need to resolve the provider from the
         // container and then try to instantiate it
         if (ensure.isString(provider)) {
@@ -57,8 +55,7 @@ class Application extends Container
     /**
      * Boot all providers in the application
      */
-    bootProviders ()
-    {
+    bootProviders () {
         var self = this;
 
         function bootProvider (provider) {
@@ -75,8 +72,7 @@ class Application extends Container
     /**
      * Register all providers in the application
      */
-    register ()
-    {
+    register () {
         var self = this;
 
         function registerProvider (provider) {
@@ -91,4 +87,4 @@ class Application extends Container
     }
 }
 
-module.exports = Application;
+export default Application;

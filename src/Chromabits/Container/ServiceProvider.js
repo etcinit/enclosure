@@ -1,8 +1,6 @@
 'use strict';
 
-let NotImplementedException = require(
-    '../Exceptions/NotImplementedException.js'
-);
+import NotImplementedException from '../Exceptions/NotImplementedException.js';
 
 /**
  * Class ServiceProvider
@@ -15,8 +13,7 @@ class ServiceProvider
     /**
      * Construct an instance of a ServiceProvider
      */
-    constructor ()
-    {
+    constructor () {
         this.booted = false;
         this.registered = false;
         this.deferred = false;
@@ -27,8 +24,7 @@ class ServiceProvider
      *
      * @param {Container} app - The current instance of the container
      */
-    boot (app)
-    {
+    boot (app) {
         //
     }
 
@@ -37,8 +33,7 @@ class ServiceProvider
      *
      * @param {Container} app = The current instance of the container
      */
-    register (app)
-    {
+    register (app) {
         throw new NotImplementedException('register()');
     }
 
@@ -47,10 +42,9 @@ class ServiceProvider
      *
      * @returns {Array}
      */
-    provides ()
-    {
+    provides () {
         return [];
     }
 }
 
-module.exports = ServiceProvider;
+export default ServiceProvider;

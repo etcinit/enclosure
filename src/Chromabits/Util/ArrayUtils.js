@@ -16,8 +16,7 @@ class ArrayUtils
      * @param def
      * @returns {*}
      */
-    static forEachUntil (target, callback, def)
-    {
+    static forEachUntil (target, callback, def) {
         // Go through the array
         for (var index in target) {
             if (target.hasOwnProperty(index)) {
@@ -39,4 +38,4 @@ class ArrayUtils
     }
 }
 
-module.exports = ArrayUtils;
+export default ArrayUtils;

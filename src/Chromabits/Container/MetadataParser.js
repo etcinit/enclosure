@@ -16,8 +16,7 @@ class MetadataParser
      *
      * @param filename
      */
-    constructor (filename = {})
-    {
+    constructor (filename = {}) {
         if (ensure.isString(filename)) {
             this.data = JSON.parse(fs.readFileSync(filename, 'utf8'));
 
@@ -41,8 +40,7 @@ class MetadataParser
      *
      * @returns {*}
      */
-    getEntrypoint ()
-    {
+    getEntrypoint () {
         if (this.data.entrypoint) {
             ensure(this.data.entrypoint, String);
 
@@ -57,8 +55,7 @@ class MetadataParser
      *
      * @returns {Array}
      */
-    getProviders ()
-    {
+    getProviders () {
         if (this.data.providers) {
             if (ensure.isArray(this.data.providers)) {
                 return this.data.providers;
@@ -75,8 +72,7 @@ class MetadataParser
      *
      * @returns {*}
      */
-    getAutoload ()
-    {
+    getAutoload () {
         if (this.data.autoload) {
             return this.data.autoload;
         }

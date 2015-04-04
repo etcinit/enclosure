@@ -1,6 +1,6 @@
 'use strict';
 
-let ensure = require('ensure.js');
+import ensure from 'ensure.js';
 
 /**
  * Class ClassMap
@@ -17,8 +17,7 @@ class ClassMap
     /**
      * Constructs an instance of a ClassMap
      */
-    constructor ()
-    {
+    constructor () {
         // Initialize properties
         this.files = {};
         this.constructors = {};
@@ -32,8 +31,7 @@ class ClassMap
      * @param fullClassName
      * @param filePath
      */
-    addFile (fullClassName, filePath)
-    {
+    addFile (fullClassName, filePath) {
         ensure(fullClassName, String);
         ensure(filePath, String);
 
@@ -48,8 +46,7 @@ class ClassMap
      * @param fullClassName
      * @param constructor
      */
-    addConstructor (fullClassName, constructor)
-    {
+    addConstructor (fullClassName, constructor) {
         ensure(fullClassName, String);
         ensure(constructor, Function);
 
@@ -62,8 +59,7 @@ class ClassMap
      * @param fullClassName
      * @returns {*}
      */
-    get (fullClassName)
-    {
+    get (fullClassName) {
         if (fullClassName in this.constructors) {
             return this.constructors[fullClassName];
         }
@@ -81,8 +77,7 @@ class ClassMap
      * @param fullClassName
      * @returns {boolean}
      */
-    has (fullClassName)
-    {
+    has (fullClassName) {
         if (fullClassName in this.constructors || fullClassName in this.files) {
             return true;
         }

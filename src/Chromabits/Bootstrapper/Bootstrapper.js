@@ -1,12 +1,12 @@
 'use strict';
 
-let rootPath = require('app-root-path');
+import rootPath from 'app-root-path';
 
-let Loader = require('../Loader/Loader.js'),
-    MetadataParser = require('../Container/MetadataParser.js'),
-    AutoloaderFactory = require('../Loader/AutoloaderFactory.js'),
-    Application = require('../Container/Application.js'),
-    EnclosureClassMap = require('../Mapper/EnclosureClassMap.js');
+import Loader from '../Loader/Loader.js';
+import MetadataParser from '../Container/MetadataParser.js';
+import AutoloaderFactory from '../Loader/AutoloaderFactory.js';
+import Application from '../Container/Application.js';
+import EnclosureClassMap from '../Mapper/EnclosureClassMap.js';
 
 /**
  * Class Bootstrapper
@@ -22,8 +22,7 @@ class Bootstrapper
      *
      * @param options
      */
-    constructor (options = {})
-    {
+    constructor (options = {}) {
         this.config = options;
 
         // If no metadata object or path is given, try to get package.json
@@ -39,8 +38,7 @@ class Bootstrapper
      *
      * @returns {Application}
      */
-    boot ()
-    {
+    boot () {
         this.bootAutoloader();
         this.bootContainer();
         this.bootApplication();
@@ -61,8 +59,7 @@ class Bootstrapper
      *
      * @returns {Application}
      */
-    softBoot ()
-    {
+    softBoot () {
         this.bootAutoloader();
         this.bootContainer();
         this.bootApplication();
@@ -73,8 +70,7 @@ class Bootstrapper
     /**
      * Setup an autoloader
      */
-    bootAutoloader ()
-    {
+    bootAutoloader () {
         let factory = new AutoloaderFactory(this.metadata.getAutoload());
 
         this.autoloader = factory.make();
@@ -83,8 +79,7 @@ class Bootstrapper
     /**
      * Setup the container
      */
-    bootContainer ()
-    {
+    bootContainer () {
         this.container = new Application();
 
         this.container.setLoader(this.autoloader);
@@ -100,14 +95,13 @@ class Bootstrapper
     /**
      * Setup the application
      */
-    bootApplication ()
-    {
+    bootApplication () {
         // Parse providers
         let providers = this.metadata.getProviders();
 
         // Add providers
         providers.forEach((provider) => {
-            this.container.addProvider(provider)
+            this.container.addProvider(provider);
         });
 
         // Register providers
@@ -122,8 +116,7 @@ class Bootstrapper
      *
      * @returns {Loader|*}
      */
-    runApplication ()
-    {
+    runApplication () {
         let entrypoint = this.container.make(this.metadata.getEntrypoint());
 
         return entrypoint.main(process.argv);
@@ -136,8 +129,7 @@ class Bootstrapper
      *
      * @returns {Bootstrapper}
      */
-    static setupPrelude(target = global)
-    {
+    static setupPrelude(target = global) {
         var loader = new Loader();
 
         loader.addMap(EnclosureClassMap);
@@ -147,4 +139,4 @@ class Bootstrapper
     }
 }
 
-module.exports = Bootstrapper;
+export default Bootstrapper;

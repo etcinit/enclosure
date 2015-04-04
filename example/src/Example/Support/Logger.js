@@ -12,10 +12,9 @@ class Logger
      *
      * @param message
      */
-    log (message)
-    {
+    log (message) {
         console.log(message);
     }
 }
 
-module.exports = Logger;
+export default Logger;

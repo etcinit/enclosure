@@ -10,10 +10,9 @@ class InvalidClassPathException extends Error
     /**
      * Construct an instance of an InvalidClassPathException
      */
-    constructor ()
-    {
+    constructor () {
         super('Invalid class path');
     }
 }
 
-module.exports = InvalidClassPathException;
+export default InvalidClassPathException;

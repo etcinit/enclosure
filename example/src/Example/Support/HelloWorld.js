@@ -12,8 +12,7 @@ class HelloWorld
      *
      * @param Example_Support_Logger
      */
-    constructor (Example_Support_Logger)
-    {
+    constructor (Example_Support_Logger) {
         // Keep references to dependencies
         this.logger = Example_Support_Logger;
     }
@@ -21,10 +20,9 @@ class HelloWorld
     /**
      * Say hello world!
      */
-    say ()
-    {
+    say () {
         this.logger.log('Hello World');
     }
 }
 
-module.exports = HelloWorld;
+export default HelloWorld;

@@ -12,8 +12,7 @@ class ClassNotFoundException
      *
      * @param className
      */
-    constructor (className)
-    {
+    constructor (className) {
         Error.call(this, arguments);
 
         this.setClassName(className);
@@ -26,11 +25,10 @@ class ClassNotFoundException
      *
      * @returns {undefined} -
      */
-    setClassName (className)
-    {
+    setClassName (className) {
         this.message = 'Class `' + className + '` is not defined in the current'
         + ' context. Check your class map setup';
     }
 }
 
-module.exports = ClassNotFoundException;
+export default ClassNotFoundException;

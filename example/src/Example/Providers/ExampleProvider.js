@@ -15,10 +15,9 @@ class ExampleProvider extends ServiceProvider
      *
      * @param app
      */
-    register (app)
-    {
+    register (app) {
         // Register the HelloWorld service
-        app.factory('HelloWorld', function () {
+        app.factory('HelloWorld', () => {
             let logger = app.make('Example/Support/Logger');
 
             return new HelloWorld(logger);
@@ -26,4 +25,4 @@ class ExampleProvider extends ServiceProvider
     }
 }
 
-module.exports = ExampleProvider;
+export default ExampleProvider;

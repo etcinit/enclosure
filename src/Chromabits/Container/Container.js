@@ -16,8 +16,7 @@ class Container
     /**
      * Construct an instance of a Container
      */
-    constructor ()
-    {
+    constructor () {
         /**
          * Container bindings
          *
@@ -79,8 +78,7 @@ class Container
      * @param abstract
      * @param instance
      */
-    instance (abstract, instance)
-    {
+    instance (abstract, instance) {
         // If the abstract is an array, we will assume it is an array of strings
         // of each each abstract we want to bind the instance to
         if (ensure.isArray(abstract)) {
@@ -107,8 +105,7 @@ class Container
      * @param concrete
      * @param shared
      */
-    bind (abstract, concrete, shared)
-    {
+    bind (abstract, concrete, shared) {
         ensure(abstract, String);
         // TODO: #1: Type-check concrete param once ensure.js supports Maybe
 
@@ -136,8 +133,7 @@ class Container
      * @param concrete
      * @param shared
      */
-    factory (abstract, concrete, shared)
-    {
+    factory (abstract, concrete, shared) {
         ensure(abstract, String);
         ensure(concrete, Function);
 
@@ -156,8 +152,7 @@ class Container
      *
      * @returns {*}
      */
-    getConcrete (abstract)
-    {
+    getConcrete (abstract) {
         // If the abstract is not defined in the bindings array
         // then we can't find a concrete, so we have to bail
         if (!(abstract in this.bindings) && !(abstract in this.factories)) {
@@ -198,8 +193,7 @@ class Container
      *
      * @returns {*}
      */
-    make (abstract)
-    {
+    make (abstract) {
         // If there is a singleton instance being managed, return it
         if (abstract in this.instances) {
             return this.instances[abstract];
@@ -207,12 +201,14 @@ class Container
 
         // Get concrete
         var concrete = abstract;
+        let instance;
+
         try {
             concrete = this.getConcrete(abstract);
 
             // If buildable, build one
             if (this.isBuildable(concrete)) {
-                var instance = this.build(concrete);
+                instance = this.build(concrete);
 
                 // If the abstract type is marked as shared, we will cache the
                 // instance as a singleton so subsequent calls to make will
@@ -229,7 +225,7 @@ class Container
                 var constructor = this.loader.get(abstract);
                 var dependencies = this.resolveDependencies(constructor);
 
-                var instance = Object.create(constructor.prototype);
+                instance = Object.create(constructor.prototype);
 
                 constructor.apply(instance, dependencies);
 
@@ -250,8 +246,10 @@ class Container
      *
      * @returns {*}
      */
-    build (concrete, parameters)
-    {
+    build (concrete, parameters) {
+        let constructor,
+            dependencies;
+
         parameters = parameters || [];
 
         // Check if there is a factory function defined for this function
@@ -285,14 +283,14 @@ class Container
         if (this.isWrapped(concrete)) {
             var wrap = this.bindings[concrete];
 
-            var dependencies = this.resolveDependencies(wrap);
+            dependencies = this.resolveDependencies(wrap);
 
             // When calling the constructor in the Wrap object, we pass a
             // reference to this container, and all the dependencies as
             // arguments
-            var constructorArguments = [this].concat(dependencies, parameters);
+            let constructorArguments = [this].concat(dependencies, parameters);
 
-            var constructor =  wrap.getConstructor();
+            constructor = wrap.getConstructor();
 
             this.buildStack.pop();
 
@@ -309,9 +307,9 @@ class Container
             concrete in this.bindings
             && this.bindings[concrete] instanceof Function
         ) {
-            var constructor = this.bindings[concrete];
+            constructor = this.bindings[concrete];
 
-            var dependencies = this.resolveDependencies(constructor);
+            dependencies = this.resolveDependencies(constructor);
 
             this.buildStack.pop();
 
@@ -337,8 +335,7 @@ class Container
      *
      * @returns {Array}
      */
-    resolveDependencies (construct)
-    {
+    resolveDependencies (construct) {
         var dependenciesNames = [],
             dependencies = [];
 
@@ -351,7 +348,7 @@ class Container
         dependenciesNames.forEach((dependencyName) => {
             dependencyName = dependencyName.replace(/_/g, '/');
 
-            dependencies.push(this.make(dependencyName))
+            dependencies.push(this.make(dependencyName));
         });
 
         return dependencies;
@@ -364,8 +361,7 @@ class Container
      *
      * @returns {boolean}
      */
-    isWrapped (concrete)
-    {
+    isWrapped (concrete) {
         return (concrete in this.bindings &&
         this.bindings[concrete] instanceof Wrap);
     }
@@ -377,8 +373,7 @@ class Container
      *
      * @returns {boolean}
      */
-    isResolvable (abstract)
-    {
+    isResolvable (abstract) {
         if (this.instances[abstract]) {
             return true;
         }
@@ -398,8 +393,7 @@ class Container
      * @param concrete
      * @returns {boolean}
      */
-    isBuildable (concrete)
-    {
+    isBuildable (concrete) {
         // If we have a factory function, we can build the type
         if (concrete in this.factories) {
             return true;
@@ -420,8 +414,7 @@ class Container
      *
      * @param loader
      */
-    setLoader (loader)
-    {
+    setLoader (loader) {
         this.loader = loader;
 
         this.instance('Chromabits/Loader/Loader', loader);
@@ -436,8 +429,7 @@ class Container
      *
      * @returns {Function}
      */
-    use (fullClassName)
-    {
+    use (fullClassName) {
         if (this.loader) {
             return this.loader.get(fullClassName);
         }
@@ -453,8 +445,7 @@ class Container
      *
      * @param target
      */
-    installTo (target)
-    {
+    installTo (target) {
         ensure(target, Object);
 
         target.container = this;

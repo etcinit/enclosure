@@ -1,10 +1,8 @@
 'use strict';
 
-let ensure = require('ensure.js');
+import ensure from 'ensure.js';
 
-let InvalidClassPathException = require(
-    './Exceptions/InvalidClassPathException'
-);
+import InvalidClassPathException from './Exceptions/InvalidClassPathException';
 
 /**
  * Class ClassPath
@@ -18,8 +16,7 @@ class ClassPath
      *
      * @param path
      */
-    constructor (path)
-    {
+    constructor (path) {
         ensure(path, String);
 
         this.original = path;
@@ -45,16 +42,14 @@ class ClassPath
      *
      * @returns {Array|{index: number, input: string}}
      */
-    isValid ()
-    {
+    isValid () {
         return this.original.match(this.fullyQualifiedNamespaceRegex);
     }
 
     /**
      * Internally parse the path
      */
-    parse ()
-    {
+    parse () {
         let original = this.original;
 
         // Check if the classpath string is valid
@@ -80,8 +75,7 @@ class ClassPath
      *
      * @returns {string}
      */
-    toString ()
-    {
+    toString () {
         if (this.relative) {
             return this.path.join('/');
         }
@@ -94,8 +88,7 @@ class ClassPath
      *
      * @returns {*}
      */
-    getClassName ()
-    {
+    getClassName () {
         return this.path[this.path.length - 1];
     }
 
@@ -104,8 +97,7 @@ class ClassPath
      *
      * @returns {string}
      */
-    getNamespace ()
-    {
+    getNamespace () {
         if (this.path.length > 1) {
             let namespace = this.path.slice(0, this.path.length - 1);
 
@@ -124,8 +116,7 @@ class ClassPath
      *
      * @returns {*}
      */
-    getNamespaceAsArray ()
-    {
+    getNamespaceAsArray () {
         if (this.path.length > 1) {
             return this.path.slice(0, this.path.length - 1);
         }
@@ -138,8 +129,7 @@ class ClassPath
      *
      * @returns {ClassPath.relative|*}
      */
-    isRelative ()
-    {
+    isRelative () {
         return this.relative;
     }
 
@@ -148,8 +138,7 @@ class ClassPath
      *
      * @returns {boolean}
      */
-    isAbsolute ()
-    {
+    isAbsolute () {
         return !this.relative;
     }
 
@@ -158,8 +147,7 @@ class ClassPath
      *
      * @returns {*}
      */
-    toAbsolute ()
-    {
+    toAbsolute () {
         // The current implementation is nothing fancy. It just appends a
         // slash if it is absolute
         if (!this.isAbsolute()) {
@@ -170,4 +158,4 @@ class ClassPath
     }
 }
 
-module.exports = ClassPath;
+export default ClassPath;

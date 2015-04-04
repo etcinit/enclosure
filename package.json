@@ -1,16 +1,17 @@
 {
   "name": "enclosure",
-  "version": "0.1.6",
-  "description": "IOC Container",
+  "version": "0.2.0",
+  "description": "IOC Container and Module Loader",
   "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/etcinit/enclosure.git"
   },
   "scripts": {
-    "test": "mocha test/ test/**/*.js",
+    "test": "babel-node node_modules/.bin/_mocha test/ test/**/*.js",
     "compile": "babel -d lib/ src/",
-    "prepublish": "npm run compile"
+    "prepublish": "npm run compile",
+    "cover": "babel-node node_modules/.bin/isparta cover --report text --report html node_modules/.bin/_mocha -- --reporter spec"
   },
   "author": "Eduardo Trujillo <ed@chromabits.com> (http://chromabits.com/)",
   "license": "MIT",
@@ -25,9 +26,11 @@
   "devDependencies": {
     "babel": "^4.6.1",
     "core-js": "^0.6.1",
+    "isparta": "git://github.com/douglasduteil/isparta",
     "istanbul": "^0.3.5",
     "mocha": "^2.1.0",
-    "should": "^4.4.2"
+    "should": "^4.4.2",
+    "babel-eslint": "^2.0.2"
   },
   "autoload": {
     "roots": [

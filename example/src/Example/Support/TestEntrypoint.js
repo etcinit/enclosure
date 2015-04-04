@@ -7,10 +7,9 @@
  */
 class TestEntrypoint
 {
-    main ()
-    {
-        return 'Correct'
+    main () {
+        return 'Correct';
     }
 }
 
-module.exports = TestEntrypoint;
+export default TestEntrypoint;

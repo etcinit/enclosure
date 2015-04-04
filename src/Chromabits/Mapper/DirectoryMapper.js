@@ -21,10 +21,9 @@ class DirectoryMapper extends AbstractMapper
      * @param {string} baseDir - Directory to use as the root of the map
      * @param extensions
      */
-    constructor (baseDir, extensions = ['js'])
-    {
+    constructor (baseDir, extensions = ['js']) {
         // Call parent constructor
-        AbstractMapper.call(this, arguments);
+        super(...arguments);
 
         this.baseDir = path.resolve(baseDir);
         this.extensions = extensions;
@@ -35,8 +34,7 @@ class DirectoryMapper extends AbstractMapper
      *
      * @returns {ClassMap}
      */
-    generate ()
-    {
+    generate () {
         let paths,
             basePath = null,
             classPath,
@@ -73,8 +71,7 @@ class DirectoryMapper extends AbstractMapper
      *
      * @returns {string}
      */
-    generateClassPath (basePath, fullPath)
-    {
+    generateClassPath (basePath, fullPath) {
         return fullPath.substr(this.baseDir.length).slice(0, -3);
     }
 
@@ -85,12 +82,11 @@ class DirectoryMapper extends AbstractMapper
      * @param extensions
      * @returns {boolean|string}
      */
-    static matchesFileType (filePath, extensions = ['.js'])
-    {
+    static matchesFileType (filePath, extensions = ['.js']) {
         return ArrayUtils.forEachUntil(extensions, (extension) => {
             // Skip this extension if the actual path is shorter
             if (filePath.length < extension.length) {
-                return;
+                return undefined;
             }
 
             // Check if this extension matches
@@ -101,4 +97,4 @@ class DirectoryMapper extends AbstractMapper
     }
 }
 
-module.exports = DirectoryMapper;
+export default DirectoryMapper;
