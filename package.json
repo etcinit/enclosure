@@ -1,6 +1,6 @@
 {
   "name": "enclosure",
-  "version": "0.2.0",
+  "version": "0.2.0-beta1",
   "description": "IOC Container and Module Loader",
   "main": "lib/index.js",
   "repository": {
