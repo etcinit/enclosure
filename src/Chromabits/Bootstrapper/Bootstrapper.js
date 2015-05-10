@@ -1,7 +1,5 @@
 'use strict';
 
-import rootPath from 'app-root-path';
-
 import Loader from '../Loader/Loader.js';
 import MetadataParser from '../Container/MetadataParser.js';
 import AutoloaderFactory from '../Loader/AutoloaderFactory.js';
@@ -27,6 +25,13 @@ class Bootstrapper
 
         // If no metadata object or path is given, try to get package.json
         if (!options.metadata) {
+            if (typeof window !== 'undefined') {
+                throw new Error(
+                    'package.json config is not available on browsers'
+                );
+            }
+
+            let rootPath = require('app-root-path');
             options.metadata = rootPath.resolve('./package.json');
         }
 
